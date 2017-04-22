@@ -130,7 +130,7 @@ fn smaller_than_1000(n: usize) -> String {
 }
 
 fn smaller_than_2000(n: usize) -> String {
-    complete("mille".to_owned(), n - 1000, true)
+    complete("mille".to_owned(), n - 1000, false)
 }
 
 fn smaller_than_1000000(n: usize) -> String {
@@ -143,7 +143,7 @@ fn smaller_than_1000000(n: usize) -> String {
     } else {
         "mille".to_owned()
     };
-    complete(prefix, rest, true)
+    complete(prefix, rest, false)
 }
 
 fn over_1000000<N: Integer + FromPrimitive + ToPrimitive>(n: &N) -> Option<String> {
@@ -192,8 +192,8 @@ fn over_1000000<N: Integer + FromPrimitive + ToPrimitive>(n: &N) -> Option<Strin
 /// use french_numbers::french_number;
 ///
 /// assert_eq!(french_number(&71), "soixante-et-onze");
-/// assert_eq!(french_number(&1001), "mille-et-un");
-/// assert_eq!(french_number(&-200001), "moins deux-cent-mille-et-un");
+/// assert_eq!(french_number(&1001), "mille-un");
+/// assert_eq!(french_number(&-200001), "moins deux-cent-mille-un");
 /// assert_eq!(french_number(&-200000001), "moins deux-cents-millions-un");
 /// assert_eq!(french_number(&-204000001), "moins deux-cent-quatre-millions-un");
 /// ```
@@ -262,10 +262,10 @@ mod tests {
         assert_eq!(basic(&872).unwrap(), "huit-cent-soixante-douze");
         assert_eq!(basic(&880).unwrap(), "huit-cent-quatre-vingts");
         assert_eq!(basic(&882).unwrap(), "huit-cent-quatre-vingt-deux");
-        assert_eq!(basic(&1001).unwrap(), "mille-et-un");
+        assert_eq!(basic(&1001).unwrap(), "mille-un");
         assert_eq!(basic(&1882).unwrap(), "mille-huit-cent-quatre-vingt-deux");
-        assert_eq!(basic(&2001).unwrap(), "deux-mille-et-un");
-        assert_eq!(basic(&300001).unwrap(), "trois-cent-mille-et-un");
+        assert_eq!(basic(&2001).unwrap(), "deux-mille-un");
+        assert_eq!(basic(&300001).unwrap(), "trois-cent-mille-un");
         assert_eq!(basic(&180203).unwrap(),
                    "cent-quatre-vingt-mille-deux-cent-trois");
         assert_eq!(basic(&180203).unwrap(),
