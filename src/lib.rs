@@ -285,13 +285,17 @@ pub fn french_number<N: Integer + FromPrimitive + ToPrimitive + Display>(n: &N) 
 /// ```
 /// use french_numbers::*;
 ///
-/// assert_eq!(french_number_options(&37251061, &Options { feminine: false, reformed: true}),
+/// assert_eq!(french_number_options(&37251061,
+///                                  &Options { feminine: false, reformed: true}),
 ///            "trente-sept-millions-deux-cent-cinquante-et-un-mille-soixante-et-un");
-/// assert_eq!(french_number_options(&37251061, &Options { feminine: true, reformed: true}),
+/// assert_eq!(french_number_options(&37251061,
+///                                  &Options { feminine: true, reformed: true}),
 ///            "trente-sept-millions-deux-cent-cinquante-et-un-mille-soixante-et-une");
-/// assert_eq!(french_number_options(&37251061, &Options { feminine: true, reformed: false }),
+/// assert_eq!(french_number_options(&37251061,
+///                                  &Options { feminine: true, reformed: false }),
 ///            "trente-sept millions deux cent cinquante et un mille soixante et une");
-/// assert_eq!(french_number_options(&37251061, &Options { feminine: false, reformed: false }),
+/// assert_eq!(french_number_options(&37251061,
+///                                  &Options { feminine: false, reformed: false }),
 ///            "trente-sept millions deux cent cinquante et un mille soixante et un")
 /// ```
 pub fn french_number_options<N: Integer + FromPrimitive + ToPrimitive + Display>(n: &N,
