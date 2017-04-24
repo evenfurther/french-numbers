@@ -15,7 +15,7 @@ fn test_french_number() {
     assert_eq!(french_number(&-17000000), "moins dix-sept-millions");
     assert_eq!(french_number(&17000000), "dix-sept-millions");
     assert_eq!(french_number(&220130202),
-    "deux-cent-vingt-millions-cent-trente-mille-deux-cent-deux");
+               "deux-cent-vingt-millions-cent-trente-mille-deux-cent-deux");
     let mut large = "un-billion-deux-cent-vingt-milliards-".to_owned();
     large.push_str("quatre-vingts-millions-trois-cent-quatre-vingt-mille-deux-cents");
     assert_eq!(french_number(&1220080380200u64), large);
@@ -53,11 +53,11 @@ fn test_feminine() {
     assert_eq!(french_number_options(&71, &options), "soixante-et-onze");
     assert_eq!(french_number_options(&81, &options), "quatre-vingt-une");
     assert_eq!(french_number_options(&21001, &options),
-    "vingt-et-un-mille-une");
+               "vingt-et-un-mille-une");
     assert_eq!(french_number_options(&1021001, &options),
-    "un-million-vingt-et-un-mille-une");
+               "un-million-vingt-et-un-mille-une");
     assert_eq!(french_number_options(&101021001, &options),
-    "cent-un-millions-vingt-et-un-mille-une");
+               "cent-un-millions-vingt-et-un-mille-une");
 }
 
 #[test]
@@ -70,11 +70,58 @@ fn test_unreformed() {
     assert_eq!(french_number_options(&21, &options), "vingt et un");
     assert_eq!(french_number_options(&71, &options), "soixante et onze");
     assert_eq!(french_number_options(&21001, &options),
-    "vingt et un mille un");
+               "vingt et un mille un");
     assert_eq!(french_number_options(&1021001, &options),
-    "un million vingt et un mille un");
+               "un million vingt et un mille un");
     assert_eq!(french_number_options(&1027001, &options),
-    "un million vingt-sept mille un");
+               "un million vingt-sept mille un");
     assert_eq!(french_number_options(&101021037, &options),
-    "cent un millions vingt et un mille trente-sept");
+               "cent un millions vingt et un mille trente-sept");
+}
+
+#[test]
+fn test_unreformed_web() {
+    // From http://www.podcastfrancaisfacile.com/
+    let options = Options {
+        feminine: false,
+        reformed: false,
+    };
+    assert_eq!(french_number_options(&3641, &options),
+               "trois mille six cent quarante et un");
+    assert_eq!(french_number_options(&2984, &options),
+               "deux mille neuf cent quatre-vingt-quatre");
+    assert_eq!(french_number_options(&7129, &options),
+               "sept mille cent vingt-neuf");
+    assert_eq!(french_number_options(&1891, &options),
+               "mille huit cent quatre-vingt-onze");
+    assert_eq!(french_number_options(&2820, &options),
+               "deux mille huit cent vingt");
+    assert_eq!(french_number_options(&1734, &options),
+               "mille sept cent trente-quatre");
+    assert_eq!(french_number_options(&1986, &options),
+               "mille neuf cent quatre-vingt-six");
+    assert_eq!(french_number_options(&6012, &options), "six mille douze");
+    assert_eq!(french_number_options(&1930, &options),
+               "mille neuf cent trente");
+    assert_eq!(french_number_options(&9021, &options),
+               "neuf mille vingt et un");
+    assert_eq!(french_number_options(&5555, &options),
+               "cinq mille cinq cent cinquante-cinq");
+    assert_eq!(french_number_options(&8080, &options),
+               "huit mille quatre-vingts");
+    assert_eq!(french_number_options(&6728, &options),
+               "six mille sept cent vingt-huit");
+    assert_eq!(french_number_options(&2773, &options),
+               "deux mille sept cent soixante-treize");
+    assert_eq!(french_number_options(&1839, &options),
+               "mille huit cent trente-neuf");
+    assert_eq!(french_number_options(&5391, &options),
+               "cinq mille trois cent quatre-vingt-onze");
+    assert_eq!(french_number_options(&3100, &options), "trois mille cent");
+    assert_eq!(french_number_options(&1193, &options),
+               "mille cent quatre-vingt-treize");
+    assert_eq!(french_number_options(&4722, &options),
+               "quatre mille sept cent vingt-deux");
+    assert_eq!(french_number_options(&6382, &options),
+               "six mille trois cent quatre-vingt-deux");
 }
