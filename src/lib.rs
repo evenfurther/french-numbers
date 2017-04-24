@@ -108,6 +108,9 @@ fn unpluralize(str: &mut String) {
 }
 
 fn complete(mut str: String, n: usize, prefix_under_100: bool, options: &Options) -> String {
+    if n != 0 {
+        unpluralize(&mut str);
+    }
     if n == 1 {
         if prefix_under_100 && options.reformed {
             str.push_str("-et-un");
@@ -122,7 +125,6 @@ fn complete(mut str: String, n: usize, prefix_under_100: bool, options: &Options
             str.push('e')
         }
     } else if n > 0 {
-        unpluralize(&mut str);
         str.push(if options.reformed || (prefix_under_100 && n < 100) {
                      '-'
                  } else {

@@ -13,6 +13,8 @@ use num_traits::*;
 fn test_french_number() {
     assert_eq!(french_number(&-17000), "moins dix-sept-mille");
     assert_eq!(french_number(&-17000000), "moins dix-sept-millions");
+    assert_eq!(french_number(&900), "neuf-cents");
+    assert_eq!(french_number(&901), "neuf-cent-un");
     assert_eq!(french_number(&17000000), "dix-sept-millions");
     assert_eq!(french_number(&220130202),
                "deux-cent-vingt-millions-cent-trente-mille-deux-cent-deux");
