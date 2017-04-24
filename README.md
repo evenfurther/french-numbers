@@ -23,8 +23,8 @@ to format any integer into the beautiful French romance language:
 use french_numbers::french_number;
 
 assert_eq!(french_number(&71), "soixante-et-onze");
-assert_eq!(french_number(&1001), "mille-et-un");
-assert_eq!(french_number(&-200001), "moins deux-cent-mille-et-un");
+assert_eq!(french_number(&1001), "mille-un");
+assert_eq!(french_number(&-200001), "moins deux-cent-mille-un");
 assert_eq!(french_number(&-200000001), "moins deux-cents-millions-un");
 assert_eq!(french_number(&-204000001), "moins deux-cent-quatre-millions-un");
 ```
