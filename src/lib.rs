@@ -48,11 +48,19 @@ fn literal_for(value: usize, options: &Options) -> Option<&'static str> {
     } else if value == 60 {
         Some("soixante")
     } else if value == 71 {
-        Some("soixante-et-onze")
+        Some(if options.reformed {
+                 "soixante-et-onze"
+             } else {
+                 "soixante et onze"
+             })
     } else if value == 80 {
         Some("quatre-vingts")
     } else if value == 81 {
-        Some("quatre-vingt-un")
+        Some(if options.feminine {
+                 "quatre-vingt-une"
+             } else {
+                 "quatre-vingt-un"
+             })
     } else if value == 100 {
         Some("cent")
     } else if value == 1000 {
@@ -101,8 +109,10 @@ fn unpluralize(str: &mut String) {
 
 fn complete(mut str: String, n: usize, prefix_under_100: bool, options: &Options) -> String {
     if n == 1 {
-        if prefix_under_100 {
+        if prefix_under_100 && options.reformed {
             str.push_str("-et-un");
+        } else if prefix_under_100 {
+            str.push_str(" et un");
         } else if options.reformed {
             str.push_str("-un");
         } else {
@@ -275,14 +285,14 @@ pub fn french_number<N: Integer + FromPrimitive + ToPrimitive + Display>(n: &N) 
 /// ```
 /// use french_numbers::*;
 ///
-/// assert_eq!(french_number_options(&251061, &Options { feminine: false, reformed: true}),
-///            "deux-cent-cinquante-et-un-mille-soixante-et-un");
-/// assert_eq!(french_number_options(&251061, &Options { feminine: true, reformed: true}),
-///            "deux-cent-cinquante-et-un-mille-soixante-et-une");
-/// assert_eq!(french_number_options(&251061, &Options { feminine: true, reformed: false }),
-///            "deux cent cinquante-et-un mille soixante-et-une");
-/// assert_eq!(french_number_options(&251061, &Options { feminine: false, reformed: false }),
-///            "deux cent cinquante-et-un mille soixante-et-un")
+/// assert_eq!(french_number_options(&37251061, &Options { feminine: false, reformed: true}),
+///            "trente-sept-millions-deux-cent-cinquante-et-un-mille-soixante-et-un");
+/// assert_eq!(french_number_options(&37251061, &Options { feminine: true, reformed: true}),
+///            "trente-sept-millions-deux-cent-cinquante-et-un-mille-soixante-et-une");
+/// assert_eq!(french_number_options(&37251061, &Options { feminine: true, reformed: false }),
+///            "trente-sept millions deux cent cinquante et un mille soixante et une");
+/// assert_eq!(french_number_options(&37251061, &Options { feminine: false, reformed: false }),
+///            "trente-sept millions deux cent cinquante et un mille soixante et un")
 /// ```
 pub fn french_number_options<N: Integer + FromPrimitive + ToPrimitive + Display>(n: &N,
                                                                                  options: &Options)
@@ -410,6 +420,8 @@ mod tests {
         };
         assert_eq!(french_number_options(&1, &options), "une");
         assert_eq!(french_number_options(&21, &options), "vingt-et-une");
+        assert_eq!(french_number_options(&71, &options), "soixante-et-onze");
+        assert_eq!(french_number_options(&81, &options), "quatre-vingt-une");
         assert_eq!(french_number_options(&21001, &options),
                    "vingt-et-un-mille-une");
         assert_eq!(french_number_options(&1021001, &options),
@@ -425,12 +437,15 @@ mod tests {
             reformed: false,
         };
         assert_eq!(french_number_options(&1, &options), "un");
-        assert_eq!(french_number_options(&21, &options), "vingt-et-un");
+        assert_eq!(french_number_options(&21, &options), "vingt et un");
+        assert_eq!(french_number_options(&71, &options), "soixante et onze");
         assert_eq!(french_number_options(&21001, &options),
-                   "vingt-et-un mille un");
+                   "vingt et un mille un");
         assert_eq!(french_number_options(&1021001, &options),
-                   "un million vingt-et-un mille un");
-        assert_eq!(french_number_options(&101021001, &options),
-                   "cent un millions vingt-et-un mille un");
+                   "un million vingt et un mille un");
+        assert_eq!(french_number_options(&1027001, &options),
+                   "un million vingt-sept mille un");
+        assert_eq!(french_number_options(&101021037, &options),
+                   "cent un millions vingt et un mille trente-sept");
     }
 }

@@ -35,12 +35,12 @@ numbers predating the 1990 orthographic reform:
 ```rust
 use french_numbers::*;
 
-assert_eq!(french_number_options(&251061, &Options { feminine: false, reformed: true}),
-           "deux-cent-cinquante-et-un-mille-soixante-et-un");
-assert_eq!(french_number_options(&251061, &Options { feminine: true, reformed: true}),
-           "deux-cent-cinquante-et-un-mille-soixante-et-une");
-assert_eq!(french_number_options(&251061, &Options { feminine: true, reformed: false }),
-           "deux cent cinquante-et-un mille soixante-et-une");
-assert_eq!(french_number_options(&251061, &Options { feminine: false, reformed: false }),
-           "deux cent cinquante-et-un mille soixante-et-un")
+assert_eq!(french_number_options(&37251061, &Options { feminine: false, reformed: true}),
+           "trente-sept-millions-deux-cent-cinquante-et-un-mille-soixante-et-un");
+assert_eq!(french_number_options(&37251061, &Options { feminine: true, reformed: true}),
+           "trente-sept-millions-deux-cent-cinquante-et-un-mille-soixante-et-une");
+assert_eq!(french_number_options(&37251061, &Options { feminine: true, reformed: false }),
+           "trente-sept millions deux cent cinquante et un mille soixante et une");
+assert_eq!(french_number_options(&37251061, &Options { feminine: false, reformed: false }),
+           "trente-sept millions deux cent cinquante et un mille soixante et un")
 ```
