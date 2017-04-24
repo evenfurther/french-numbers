@@ -28,3 +28,19 @@ assert_eq!(french_number(&-200001), "moins deux-cent-mille-un");
 assert_eq!(french_number(&-200000001), "moins deux-cents-millions-un");
 assert_eq!(french_number(&-204000001), "moins deux-cent-quatre-millions-un");
 ```
+
+You can also request the use of the feminine form, or prefer the previous way of writing
+numbers predating the 1990 orthographic reform:
+
+```rust
+use french_numbers::*;
+
+assert_eq!(french_number_options(&251061, &Options { feminine: false, reformed: true}),
+           "deux-cent-cinquante-et-un-mille-soixante-et-un");
+assert_eq!(french_number_options(&251061, &Options { feminine: true, reformed: true}),
+           "deux-cent-cinquante-et-un-mille-soixante-et-une");
+assert_eq!(french_number_options(&251061, &Options { feminine: true, reformed: false }),
+           "deux cent cinquante-et-un mille soixante-et-une");
+assert_eq!(french_number_options(&251061, &Options { feminine: false, reformed: false }),
+           "deux cent cinquante-et-un mille soixante-et-un")
+```

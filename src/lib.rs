@@ -1,6 +1,6 @@
 //! This crate transforms a number into its French representation
 
-#![warn(missing_docs)]
+#![deny(missing_docs)]
 
 extern crate num_integer;
 extern crate num_traits;
@@ -9,12 +9,35 @@ use num_integer::*;
 use num_traits::*;
 use std::fmt::Display;
 
-fn literal_for(value: usize) -> Option<&'static str> {
+/// Options for French number representation
+#[derive(Debug)]
+pub struct Options {
+    /// Set to `true` to get a feminine declination (default `false`).
+    /// This only affects numbers ending in 1.
+    pub feminine: bool,
+    /// Set to `false` to prevent hyphens from being inserted between
+    /// literals greater than 100 (default `true`). This corresponds
+    /// to the way of writing predating the 1990 orthographic reform.
+    pub reformed: bool,
+}
+
+impl Default for Options {
+    fn default() -> Options {
+        Options {
+            feminine: false,
+            reformed: true,
+        }
+    }
+}
+
+fn literal_for(value: usize, options: &Options) -> Option<&'static str> {
     static SMALLS: [&'static str; 21] = ["zéro", "un", "deux", "trois", "quatre", "cinq", "six",
                                          "sept", "huit", "neuf", "dix", "onze", "douze", "treize",
                                          "quatorze", "quinze", "seize", "dix-sept", "dix-huit",
                                          "dix-neuf", "vingt"];
-    if value <= 20 {
+    if value == 1 && options.feminine {
+        Some("une")
+    } else if value <= 20 {
         Some(SMALLS[value])
     } else if value == 30 {
         Some("trente")
@@ -76,81 +99,113 @@ fn unpluralize(str: &mut String) {
     }
 }
 
-fn complete(mut str: String, n: usize, et: bool) -> String {
+fn complete(mut str: String, n: usize, prefix_under_100: bool, options: &Options) -> String {
     if n == 1 {
-        str.push_str(if et { "-et-un" } else { "-un" });
+        if prefix_under_100 {
+            str.push_str("-et-un");
+        } else if options.reformed {
+            str.push_str("-un");
+        } else {
+            str.push_str(" un");
+        }
+        if options.feminine {
+            str.push('e')
+        }
     } else if n > 0 {
         unpluralize(&mut str);
-        str.push('-');
-        str.push_str(&basic(&n).unwrap());
+        str.push(if options.reformed || (prefix_under_100 && n < 100) {
+                     '-'
+                 } else {
+                     ' '
+                 });
+        str.push_str(&basic(&n, options).unwrap());
     }
     str
 }
 
-fn basic<N: Integer + FromPrimitive + ToPrimitive>(n: &N) -> Option<String> {
+fn basic<N: Integer + FromPrimitive + ToPrimitive>(n: &N, options: &Options) -> Option<String> {
     if let Some(n) = n.to_usize() {
-        if let Some(literal) = literal_for(n) {
+        if let Some(literal) = literal_for(n, options) {
             return Some(literal.to_owned());
         } else if n < 60 {
-            return Some(smaller_than_60(n));
+            return Some(smaller_than_60(n, options));
         } else if n < 80 {
-            return Some(base_onto(60, n));
+            return Some(base_onto(60, n, options));
         } else if n < 100 {
-            return Some(base_onto(80, n));
+            return Some(base_onto(80, n, options));
         } else if n < 1000 {
-            return Some(smaller_than_1000(n));
+            return Some(smaller_than_1000(n, options));
         } else if n < 2000 {
-            return Some(smaller_than_2000(n));
+            return Some(smaller_than_2000(n, options));
         } else if n < 1000000 {
-            return Some(smaller_than_1000000(n));
+            return Some(smaller_than_1000000(n, options));
         }
     }
-    over_1000000(n)
+    over_1000000(n, options)
 }
 
-fn smaller_than_60(n: usize) -> String {
+fn smaller_than_60(n: usize, options: &Options) -> String {
     let unit = n % 10;
-    complete(basic(&(n - unit)).unwrap(), unit, true)
+    complete(basic(&(n - unit), &Default::default()).unwrap(),
+             unit,
+             true,
+             options)
 }
 
-fn base_onto(b: usize, n: usize) -> String {
-    complete(literal_for(b).unwrap().to_owned(), n - b, true)
+fn base_onto(b: usize, n: usize, options: &Options) -> String {
+    complete(literal_for(b, options).unwrap().to_owned(),
+             n - b,
+             true,
+             options)
 }
 
-fn smaller_than_1000(n: usize) -> String {
+fn smaller_than_1000(n: usize, options: &Options) -> String {
     let (hundredths, rest) = n.div_rem(&100);
     let result = if hundredths > 1 {
-        let mut prefix = literal_for(hundredths).unwrap().to_owned();
-        prefix.push_str("-cents");
+        let mut prefix = literal_for(hundredths, options).unwrap().to_owned();
+        push_space_or_dash(&mut prefix, options);
+        prefix.push_str("cents");
         prefix
     } else {
         "cent".to_owned()
     };
-    complete(result, rest, false)
+    complete(result, rest, false, options)
 }
 
-fn smaller_than_2000(n: usize) -> String {
-    complete("mille".to_owned(), n - 1000, false)
+fn smaller_than_2000(n: usize, options: &Options) -> String {
+    complete("mille".to_owned(), n - 1000, false, options)
 }
 
-fn smaller_than_1000000(n: usize) -> String {
+fn push_space_or_dash(str: &mut String, options: &Options) {
+    str.push(if options.reformed { '-' } else { ' ' });
+}
+
+fn smaller_than_1000000(n: usize, options: &Options) -> String {
     let (thousands, rest) = n.div_rem(&1000);
     let prefix = if thousands > 1 {
-        let mut thousands = basic(&thousands).unwrap();
+        let mut thousands = basic(&thousands,
+                                  &Options {
+                                       feminine: false,
+                                       ..*options
+                                   })
+                .unwrap();
         unpluralize(&mut thousands);
-        thousands.push_str("-mille");
+        push_space_or_dash(&mut thousands, options);
+        thousands.push_str("mille");
         thousands
     } else {
         "mille".to_owned()
     };
-    complete(prefix, rest, false)
+    complete(prefix, rest, false, options)
 }
 
-fn over_1000000<N: Integer + FromPrimitive + ToPrimitive>(n: &N) -> Option<String> {
+fn over_1000000<N: Integer + FromPrimitive + ToPrimitive>(n: &N,
+                                                          options: &Options)
+                                                          -> Option<String> {
     let thousand = N::from_u32(1000).unwrap();
     let (mut n, small) = n.div_rem(&N::from_u32(1000000).unwrap());
     let mut base = if small != N::zero() {
-        basic(&small).unwrap()
+        basic(&small, options).unwrap()
     } else {
         String::new()
     };
@@ -159,8 +214,13 @@ fn over_1000000<N: Integer + FromPrimitive + ToPrimitive>(n: &N) -> Option<Strin
         let (rest, prefix) = n.div_rem(&thousand);
         let prefix = prefix.to_usize().unwrap();
         if prefix > 0 {
-            let mut str = basic(&prefix).unwrap();
-            str.push('-');
+            let mut str = basic(&prefix,
+                                &Options {
+                                     feminine: false,
+                                     ..*options
+                                 })
+                    .unwrap();
+            push_space_or_dash(&mut str, options);
             if let Some(unit) = unit_for(log1000) {
                 str.push_str(&unit);
             } else {
@@ -170,7 +230,7 @@ fn over_1000000<N: Integer + FromPrimitive + ToPrimitive>(n: &N) -> Option<Strin
                 str.push('s');
             }
             if !base.is_empty() {
-                str.push('-');
+                push_space_or_dash(&mut str, options);
                 str.push_str(&base);
             }
             base = str;
@@ -186,6 +246,10 @@ fn over_1000000<N: Integer + FromPrimitive + ToPrimitive>(n: &N) -> Option<Strin
 /// If the number is too large (greater than 10^103), then its numerical
 /// representation is returned with a leading minus sign if needed.
 ///
+/// By default, the masculine declination is used, as well as the preferred
+/// orthographic form introduced in the 1990 reform (use hyphens everywhere).
+/// See `french_number_options` if you wish to change either of those options.
+///
 /// # Example
 ///
 /// ```
@@ -198,16 +262,41 @@ fn over_1000000<N: Integer + FromPrimitive + ToPrimitive>(n: &N) -> Option<Strin
 /// assert_eq!(french_number(&-204000001), "moins deux-cent-quatre-millions-un");
 /// ```
 pub fn french_number<N: Integer + FromPrimitive + ToPrimitive + Display>(n: &N) -> String {
+    french_number_options(n, &Default::default())
+}
+
+/// Compute the French language representation of the given number.
+///
+/// If the number is too large (greater than 10^103), then its numerical
+/// representation is returned with a leading minus sign if needed.
+///
+/// # Example
+///
+/// ```
+/// use french_numbers::*;
+///
+/// assert_eq!(french_number_options(&251061, &Options { feminine: false, reformed: true}),
+///            "deux-cent-cinquante-et-un-mille-soixante-et-un");
+/// assert_eq!(french_number_options(&251061, &Options { feminine: true, reformed: true}),
+///            "deux-cent-cinquante-et-un-mille-soixante-et-une");
+/// assert_eq!(french_number_options(&251061, &Options { feminine: true, reformed: false }),
+///            "deux cent cinquante-et-un mille soixante-et-une");
+/// assert_eq!(french_number_options(&251061, &Options { feminine: false, reformed: false }),
+///            "deux cent cinquante-et-un mille soixante-et-un")
+/// ```
+pub fn french_number_options<N: Integer + FromPrimitive + ToPrimitive + Display>(n: &N,
+                                                                                 options: &Options)
+-> String{
     if n < &N::zero() {
         // Take the absolute value of n without consuming it. Since n is
         // negative, we know that we can build the -1 constant.
         let n = n.div_floor(&N::from_isize(-1).unwrap());
-        if let Some(str) = basic(&n) {
+        if let Some(str) = basic(&n, options) {
             let mut result = "moins ".to_owned();
             result.push_str(&str);
             return result;
         }
-    } else if let Some(result) = basic(n) {
+    } else if let Some(result) = basic(n, options) {
         return result;
     }
     n.to_string()
@@ -224,8 +313,8 @@ mod tests {
 
     #[test]
     fn test_literal_for() {
-        assert_eq!(literal_for(30), Some("trente"));
-        assert_eq!(literal_for(31), None);
+        assert_eq!(literal_for(30, &Default::default()), Some("trente"));
+        assert_eq!(literal_for(31, &Default::default()), None);
     }
 
     #[test]
@@ -247,30 +336,36 @@ mod tests {
 
     #[test]
     fn test_basic() {
-        assert_eq!(basic(&0).unwrap(), "zéro");
-        assert_eq!(basic(&21).unwrap(), "vingt-et-un");
-        assert_eq!(basic(&54).unwrap(), "cinquante-quatre");
-        assert_eq!(basic(&64).unwrap(), "soixante-quatre");
-        assert_eq!(basic(&71).unwrap(), "soixante-et-onze");
-        assert_eq!(basic(&72).unwrap(), "soixante-douze");
-        assert_eq!(basic(&80).unwrap(), "quatre-vingts");
-        assert_eq!(basic(&81).unwrap(), "quatre-vingt-un");
-        assert_eq!(basic(&91).unwrap(), "quatre-vingt-onze");
-        assert_eq!(basic(&101).unwrap(), "cent-un");
-        assert_eq!(basic(&800).unwrap(), "huit-cents");
-        assert_eq!(basic(&803).unwrap(), "huit-cent-trois");
-        assert_eq!(basic(&872).unwrap(), "huit-cent-soixante-douze");
-        assert_eq!(basic(&880).unwrap(), "huit-cent-quatre-vingts");
-        assert_eq!(basic(&882).unwrap(), "huit-cent-quatre-vingt-deux");
-        assert_eq!(basic(&1001).unwrap(), "mille-un");
-        assert_eq!(basic(&1882).unwrap(), "mille-huit-cent-quatre-vingt-deux");
-        assert_eq!(basic(&2001).unwrap(), "deux-mille-un");
-        assert_eq!(basic(&300001).unwrap(), "trois-cent-mille-un");
-        assert_eq!(basic(&180203).unwrap(),
+        assert_eq!(basic(&0, &Default::default()).unwrap(), "zéro");
+        assert_eq!(basic(&21, &Default::default()).unwrap(), "vingt-et-un");
+        assert_eq!(basic(&54, &Default::default()).unwrap(), "cinquante-quatre");
+        assert_eq!(basic(&64, &Default::default()).unwrap(), "soixante-quatre");
+        assert_eq!(basic(&71, &Default::default()).unwrap(), "soixante-et-onze");
+        assert_eq!(basic(&72, &Default::default()).unwrap(), "soixante-douze");
+        assert_eq!(basic(&80, &Default::default()).unwrap(), "quatre-vingts");
+        assert_eq!(basic(&81, &Default::default()).unwrap(), "quatre-vingt-un");
+        assert_eq!(basic(&91, &Default::default()).unwrap(),
+                   "quatre-vingt-onze");
+        assert_eq!(basic(&101, &Default::default()).unwrap(), "cent-un");
+        assert_eq!(basic(&800, &Default::default()).unwrap(), "huit-cents");
+        assert_eq!(basic(&803, &Default::default()).unwrap(), "huit-cent-trois");
+        assert_eq!(basic(&872, &Default::default()).unwrap(),
+                   "huit-cent-soixante-douze");
+        assert_eq!(basic(&880, &Default::default()).unwrap(),
+                   "huit-cent-quatre-vingts");
+        assert_eq!(basic(&882, &Default::default()).unwrap(),
+                   "huit-cent-quatre-vingt-deux");
+        assert_eq!(basic(&1001, &Default::default()).unwrap(), "mille-un");
+        assert_eq!(basic(&1882, &Default::default()).unwrap(),
+                   "mille-huit-cent-quatre-vingt-deux");
+        assert_eq!(basic(&2001, &Default::default()).unwrap(), "deux-mille-un");
+        assert_eq!(basic(&300001, &Default::default()).unwrap(),
+                   "trois-cent-mille-un");
+        assert_eq!(basic(&180203, &Default::default()).unwrap(),
                    "cent-quatre-vingt-mille-deux-cent-trois");
-        assert_eq!(basic(&180203).unwrap(),
+        assert_eq!(basic(&180203, &Default::default()).unwrap(),
                    "cent-quatre-vingt-mille-deux-cent-trois");
-        assert_eq!(basic(&17180203).unwrap(),
+        assert_eq!(basic(&17180203, &Default::default()).unwrap(),
                    "dix-sept-millions-cent-quatre-vingt-mille-deux-cent-trois");
     }
 
@@ -305,5 +400,37 @@ mod tests {
         }
         assert_eq!(french_number(&big), big.to_string());
         assert_eq!(french_number(&-big.clone()), (-big).to_string());
+    }
+
+    #[test]
+    fn test_feminine() {
+        let options = Options {
+            feminine: true,
+            reformed: true,
+        };
+        assert_eq!(french_number_options(&1, &options), "une");
+        assert_eq!(french_number_options(&21, &options), "vingt-et-une");
+        assert_eq!(french_number_options(&21001, &options),
+                   "vingt-et-un-mille-une");
+        assert_eq!(french_number_options(&1021001, &options),
+                   "un-million-vingt-et-un-mille-une");
+        assert_eq!(french_number_options(&101021001, &options),
+                   "cent-un-millions-vingt-et-un-mille-une");
+    }
+
+    #[test]
+    fn test_unreformed() {
+        let options = Options {
+            feminine: false,
+            reformed: false,
+        };
+        assert_eq!(french_number_options(&1, &options), "un");
+        assert_eq!(french_number_options(&21, &options), "vingt-et-un");
+        assert_eq!(french_number_options(&21001, &options),
+                   "vingt-et-un mille un");
+        assert_eq!(french_number_options(&1021001, &options),
+                   "un million vingt-et-un mille un");
+        assert_eq!(french_number_options(&101021001, &options),
+                   "cent un millions vingt-et-un mille un");
     }
 }
