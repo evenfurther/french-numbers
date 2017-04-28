@@ -9,7 +9,7 @@ use num_traits::*;
 use std::process::exit;
 use std::io::Write;
 
-fn print_usage<W: Write>(program: &str, opts: getopts::Options, output: &mut W) {
+fn print_usage<W: Write>(program: &str, opts: &getopts::Options, output: &mut W) {
     let brief = format!("Usage: {} FILE [options] low [high]", program);
     write!(output, "{}", opts.usage(&brief)).unwrap();
 }
@@ -29,12 +29,12 @@ fn main() {
         Ok(m) => m,
         Err(f) => {
             writeln!(&mut std::io::stderr(), "{}", f.to_string()).unwrap();
-            print_usage(&program, opts, &mut std::io::stderr());
+            print_usage(&program, &opts, &mut std::io::stderr());
             exit(1);
         }
     };
     if matches.opt_present("h") {
-        print_usage(&program, opts, &mut std::io::stdout());
+        print_usage(&program, &opts, &mut std::io::stdout());
         return;
     }
     let options = Options {
@@ -42,7 +42,7 @@ fn main() {
         reformed: !matches.opt_present("r"),
     };
     if matches.free.len() != 1 && matches.free.len() != 2 {
-        print_usage(&program, opts, &mut std::io::stderr());
+        print_usage(&program, &opts, &mut std::io::stderr());
         exit(1);
     }
     let low = matches.free[0]
