@@ -70,7 +70,7 @@ fn literal_for(value: usize, options: &Options) -> Option<&'static str> {
     }
 }
 
-fn unit_for(log1000: usize) -> Option<String> {
+fn add_unit_for(str: &mut String, prefix_count: usize, log1000: usize) -> bool {
     static PREFIXES: [&'static str; 16] = ["m",
                                            "b",
                                            "tr",
@@ -89,14 +89,17 @@ fn unit_for(log1000: usize) -> Option<String> {
                                            "sexdéc"];
     PREFIXES
         .get(log1000 / 2)
-        .map(|unit| {
-            let mut unit = (*unit).to_owned();
+        .map_or(false, |prefix| {
+            str.push_str(prefix);
             if log1000 % 2 == 0 {
-                unit.push_str("illion");
+                str.push_str("illion");
             } else {
-                unit.push_str("illiard");
+                str.push_str("illiard");
             }
-            unit
+            if prefix_count > 1 {
+                str.push('s');
+            }
+            true
         })
 }
 
@@ -233,13 +236,8 @@ fn over_1000000<N: Integer + FromPrimitive + ToPrimitive>(n: &N,
                                  })
                     .unwrap();
             push_space_or_dash(&mut str, options);
-            if let Some(unit) = unit_for(log1000) {
-                str.push_str(&unit);
-            } else {
+            if !add_unit_for(&mut str, prefix, log1000) {
                 return None;
-            }
-            if prefix > 1 && !str.ends_with('s') {
-                str.push('s');
             }
             if !base.is_empty() {
                 push_space_or_dash(&mut str, options);
@@ -330,10 +328,17 @@ mod tests {
     }
 
     #[test]
-    fn test_unit_for() {
-        assert_eq!(unit_for(0).unwrap(), "million");
-        assert_eq!(unit_for(3).unwrap(), "billiard");
-        assert_eq!(unit_for(97), None);
+    fn test_add_unit_for() {
+        let mut str = String::new();
+        assert_eq!(add_unit_for(&mut str, 1, 0), true);
+        assert_eq!(str, "million");
+        str.clear();
+        assert_eq!(add_unit_for(&mut str, 2, 0), true);
+        assert_eq!(str, "millions");
+        str.clear();
+        assert_eq!(add_unit_for(&mut str, 1, 3), true);
+        assert_eq!(str, "billiard");
+        assert_eq!(add_unit_for(&mut str, 1, 97), false);
     }
 
     #[test]
