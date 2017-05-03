@@ -30,6 +30,15 @@ impl Default for Options {
     }
 }
 
+impl Options {
+    fn masculine(&self) -> Self {
+        Options {
+            feminine: false,
+            ..*self
+        }
+    }
+}
+
 fn literal_for(value: usize, options: &Options) -> Option<&'static str> {
     static SMALLS: [&'static str; 21] = ["zéro", "un", "deux", "trois", "quatre", "cinq", "six",
                                          "sept", "huit", "neuf", "dix", "onze", "douze", "treize",
@@ -198,12 +207,7 @@ fn push_space_or_dash(str: &mut String, options: &Options) {
 fn smaller_than_1000000(n: usize, options: &Options) -> String {
     let (thousands, rest) = n.div_rem(&1000);
     let prefix = if thousands > 1 {
-        let mut thousands = basic(&thousands,
-                                  &Options {
-                                       feminine: false,
-                                       ..*options
-                                   })
-                .unwrap();
+        let mut thousands = basic(&thousands, &options.masculine()).unwrap();
         unpluralize(&mut thousands);
         push_space_or_dash(&mut thousands, options);
         thousands.push_str("mille");
@@ -229,12 +233,7 @@ fn over_1000000<N: Integer + FromPrimitive + ToPrimitive>(n: &N,
         let (rest, prefix) = n.div_rem(&thousand);
         let prefix = prefix.to_usize().unwrap();
         if prefix > 0 {
-            let mut str = basic(&prefix,
-                                &Options {
-                                     feminine: false,
-                                     ..*options
-                                 })
-                    .unwrap();
+            let mut str = basic(&prefix, &options.masculine()).unwrap();
             push_space_or_dash(&mut str, options);
             if !add_unit_for(&mut str, prefix, log1000) {
                 return None;
