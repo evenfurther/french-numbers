@@ -127,3 +127,27 @@ fn test_unreformed_web() {
     assert_eq!(french_number_options(&6382, &options),
                "six mille trois cent quatre-vingt-deux");
 }
+
+fn check_reference(str: &str, options: &Options) {
+    for line in str.lines() {
+        let mut splitted = line.trim().splitn(2, ' ');
+        let n = splitted
+            .next()
+            .expect("number not found")
+            .parse::<u32>()
+            .expect("unparsable number");
+        let s = splitted.next().expect("french text not found");
+        assert_eq!(french_number_options(&n, options), s);
+    }
+}
+
+#[test]
+fn test_reference() {
+    check_reference(include_str!("files/nombres-francais.txt"),
+                    &Default::default());
+    check_reference(include_str!("files/nombres-francais-pre-reforme.txt"),
+                    &Options {
+                         reformed: false,
+                         ..Default::default()
+                     });
+}
