@@ -50,25 +50,19 @@ An example program can dump particular number, with different options:
 
 ``` bash
 % cargo run --example french-number -- --help
-Usage: target/debug/examples/french-number FILE [options] low [high]
+Print number(s) in French
 
-Options:
-    -f, --feminine      use the feminine declination
-    -p, --prefix        prefix with the numerical representation
-    -r, --no-reform     use the pre-1990 orthographic reform writing
-    -h, --help          this help
+USAGE:
+    french-number [FLAGS] <LOW> [HIGH]
 
-% cargo run --example french-number -- -f -p -r 198 203
-198 cent quatre-vingt-dix-huit
-199 cent quatre-vingt-dix-neuf
-200 deux cents
-201 deux cent une
-202 deux cent deux
-203 deux cent trois
+FLAGS:
+    -f, --feminine     use the feminine declination
+    -h, --help         Prints help information
+    -r, --no-reform    use the pre-1990 orthographic reform writing
+    -p, --prefix       prefix output with the numerical representation
+    -V, --version      Prints version information
 
-% cargo run --example french-number -- -r 378492141000000
-trois cent soixante-dix-huit billions quatre cent quatre-vingt-douze milliards cent quarante et un millions
-
-% cargo run --example french-number -- 10000050000000004000000000000002
-dix-quintillions-cinquante-quadrillions-quatre-billiards-deux
+ARGS:
+    <LOW>     number (or low bound) to use
+    <HIGH>    optional high bound
 ```
