@@ -1,62 +1,44 @@
-extern crate getopts;
+#[macro_use]
+extern crate clap;
 extern crate french_numbers;
 extern crate num_bigint;
 extern crate num_traits;
 
+use clap::*;
 use french_numbers::*;
 use num_bigint::BigInt;
 use num_traits::*;
-use std::process::exit;
-use std::io::Write;
-
-fn print_usage<W: Write>(program: &str, opts: &getopts::Options, output: &mut W) {
-    let brief = format!("Usage: {} FILE [options] low [high]", program);
-    write!(output, "{}", opts.usage(&brief)).unwrap();
-}
 
 // List a single number, or numbers between two bounds given on the command line
 fn main() {
-    let args: Vec<String> = std::env::args().collect();
-    let program = args[0].clone();
-    let mut opts = getopts::Options::new();
-    opts.optflag("f", "feminine", "use the feminine declination");
-    opts.optflag("p", "prefix", "prefix with the numerical representation");
-    opts.optflag("r",
-                 "no-reform",
-                 "use the pre-1990 orthographic reform writing");
-    opts.optflag("h", "help", "this help");
-    let matches = match opts.parse(&args[1..]) {
-        Ok(m) => m,
-        Err(f) => {
-            writeln!(&mut std::io::stderr(), "{}", f.to_string()).unwrap();
-            print_usage(&program, &opts, &mut std::io::stderr());
-            exit(1);
-        }
-    };
-    if matches.opt_present("h") {
-        print_usage(&program, &opts, &mut std::io::stdout());
-        return;
-    }
+    let matches = App::new("french-number")
+        .about("Print number(s) in French")
+        .author(crate_authors!("\n"))
+        .version(crate_version!())
+        .args_from_usage("
+            -f, --feminine   'use the feminine declination'
+            -p, --prefix     'prefix output with the numerical representation'
+            -r, --no-reform  'use the pre-1990 orthographic reform writing'
+            <LOW>            'number (or low bound) to use'
+            [HIGH]           'optional high bound'")
+        .get_matches();
     let options = Options {
-        feminine: matches.opt_present("f"),
-        reformed: !matches.opt_present("r"),
+        feminine: matches.is_present("feminine"),
+        reformed: !matches.is_present("no-reform"),
     };
-    if matches.free.len() != 1 && matches.free.len() != 2 {
-        print_usage(&program, &opts, &mut std::io::stderr());
-        exit(1);
-    }
-    let low = matches.free[0]
+    let low = matches
+        .value_of("LOW")
+        .unwrap()
         .parse::<BigInt>()
         .expect("low bound must be an integer");
-    let high = if matches.free.len() == 2 {
-        matches.free[1]
-            .parse::<BigInt>()
-            .expect("high  bound must be an integer")
-    } else {
-        low.clone()
-    };
+    let high = matches
+        .value_of("HIGH")
+        .map_or(low.clone(), |h| {
+            h.parse::<BigInt>()
+                .expect("high  bound must be an integer")
+        });
 
-    let use_prefix = matches.opt_present("p");
+    let use_prefix = matches.is_present("prefix");
     let mut i = low;
     while i <= high {
         let repr = french_number_options(&i, &options);
