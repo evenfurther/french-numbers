@@ -33,10 +33,8 @@ fn main() {
         .expect("low bound must be an integer");
     let high = matches
         .value_of("HIGH")
-        .map_or(low.clone(), |h| {
-            h.parse::<BigInt>()
-                .expect("high  bound must be an integer")
-        });
+        .map_or(low.clone(),
+                |h| h.parse::<BigInt>().expect("high  bound must be an integer"));
 
     let use_prefix = matches.is_present("prefix");
     let mut i = low;

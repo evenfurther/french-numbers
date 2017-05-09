@@ -147,7 +147,7 @@ fn test_reference() {
                     &Default::default());
     check_reference(include_str!("files/nombres-francais-pre-reforme.txt"),
                     &Options {
-                         reformed: false,
-                         ..Default::default()
-                     });
+                        reformed: false,
+                        ..Default::default()
+                    });
 }
