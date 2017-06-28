@@ -15,26 +15,25 @@ fn main() {
         .about("Print number(s) in French")
         .author(crate_authors!("\n"))
         .version(crate_version!())
-        .args_from_usage("
+        .args_from_usage(
+            "
             -f, --feminine   'use the feminine declination'
             -p, --prefix     'prefix output with the numerical representation'
             -r, --no-reform  'use the pre-1990 orthographic reform writing'
             <LOW>            'number (or low bound) to use'
-            [HIGH]           'optional high bound'")
+            [HIGH]           'optional high bound'",
+        )
         .get_matches();
     let options = Options {
         feminine: matches.is_present("feminine"),
         reformed: !matches.is_present("no-reform"),
     };
-    let low = matches
-        .value_of("LOW")
-        .unwrap()
-        .parse::<BigInt>()
-        .expect("low bound must be an integer");
-    let high = matches
-        .value_of("HIGH")
-        .map_or(low.clone(),
-                |h| h.parse::<BigInt>().expect("high  bound must be an integer"));
+    let low = matches.value_of("LOW").unwrap().parse::<BigInt>().expect(
+        "low bound must be an integer",
+    );
+    let high = matches.value_of("HIGH").map_or(low.clone(), |h| {
+        h.parse::<BigInt>().expect("high  bound must be an integer")
+    });
 
     let use_prefix = matches.is_present("prefix");
     let mut i = low;
