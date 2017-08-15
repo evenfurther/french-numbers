@@ -180,7 +180,7 @@ fn basic<N: Integer + FromPrimitive + ToPrimitive>(n: &N, options: &Options) -> 
             return Some(smaller_than_1000(n, options));
         } else if n < 2000 {
             return Some(smaller_than_2000(n, options));
-        } else if n < 1000000 {
+        } else if n < 1_000_000 {
             return Some(smaller_than_1000000(n, options));
         }
     }
@@ -246,7 +246,7 @@ fn over_1000000<N: Integer + FromPrimitive + ToPrimitive>(
     options: &Options,
 ) -> Option<String> {
     let thousand = N::from_u32(1000).unwrap();
-    let (mut n, small) = n.div_rem(&N::from_u32(1000000).unwrap());
+    let (mut n, small) = n.div_rem(&N::from_u32(1_000_000).unwrap());
     let mut base = if small != N::zero() {
         basic(&small, options).unwrap()
     } else {

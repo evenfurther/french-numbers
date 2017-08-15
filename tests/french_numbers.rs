@@ -11,20 +11,20 @@ use num_traits::*;
 
 #[test]
 fn test_french_number() {
-    assert_eq!(french_number(&-17000), "moins dix-sept-mille");
-    assert_eq!(french_number(&-17000000), "moins dix-sept-millions");
+    assert_eq!(french_number(&-17_000), "moins dix-sept-mille");
+    assert_eq!(french_number(&-17_000_000), "moins dix-sept-millions");
     assert_eq!(french_number(&900), "neuf-cents");
     assert_eq!(french_number(&901), "neuf-cent-un");
-    assert_eq!(french_number(&17000000), "dix-sept-millions");
+    assert_eq!(french_number(&17_000_000), "dix-sept-millions");
     assert_eq!(
-        french_number(&220130202),
+        french_number(&220_130_202),
         "deux-cent-vingt-millions-cent-trente-mille-deux-cent-deux"
     );
     let mut large = "un-billion-deux-cent-vingt-milliards-".to_owned();
     large.push_str(
         "quatre-vingts-millions-trois-cent-quatre-vingt-mille-deux-cents",
     );
-    assert_eq!(french_number(&1220080380200u64), large);
+    assert_eq!(french_number(&1_220_080_380_200u64), large);
 }
 
 #[test]
@@ -59,15 +59,15 @@ fn test_feminine() {
     assert_eq!(french_number_options(&71, &options), "soixante-et-onze");
     assert_eq!(french_number_options(&81, &options), "quatre-vingt-une");
     assert_eq!(
-        french_number_options(&21001, &options),
+        french_number_options(&21_001, &options),
         "vingt-et-un-mille-une"
     );
     assert_eq!(
-        french_number_options(&1021001, &options),
+        french_number_options(&1_021_001, &options),
         "un-million-vingt-et-un-mille-une"
     );
     assert_eq!(
-        french_number_options(&101021001, &options),
+        french_number_options(&101_021_001, &options),
         "cent-un-millions-vingt-et-un-mille-une"
     );
 }
@@ -82,19 +82,19 @@ fn test_unreformed() {
     assert_eq!(french_number_options(&21, &options), "vingt et un");
     assert_eq!(french_number_options(&71, &options), "soixante et onze");
     assert_eq!(
-        french_number_options(&21001, &options),
+        french_number_options(&21_001, &options),
         "vingt et un mille un"
     );
     assert_eq!(
-        french_number_options(&1021001, &options),
+        french_number_options(&1_021_001, &options),
         "un million vingt et un mille un"
     );
     assert_eq!(
-        french_number_options(&1027001, &options),
+        french_number_options(&1_027_001, &options),
         "un million vingt-sept mille un"
     );
     assert_eq!(
-        french_number_options(&101021037, &options),
+        french_number_options(&101_021_037, &options),
         "cent un millions vingt et un mille trente-sept"
     );
 }
