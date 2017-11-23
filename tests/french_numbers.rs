@@ -21,9 +21,7 @@ fn test_french_number() {
         "deux-cent-vingt-millions-cent-trente-mille-deux-cent-deux"
     );
     let mut large = "un-billion-deux-cent-vingt-milliards-".to_owned();
-    large.push_str(
-        "quatre-vingts-millions-trois-cent-quatre-vingt-mille-deux-cents",
-    );
+    large.push_str("quatre-vingts-millions-trois-cent-quatre-vingt-mille-deux-cents");
     assert_eq!(french_number(&1_220_080_380_200u64), large);
 }
 

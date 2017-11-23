@@ -28,9 +28,11 @@ fn main() {
         feminine: matches.is_present("feminine"),
         reformed: !matches.is_present("no-reform"),
     };
-    let low = matches.value_of("LOW").unwrap().parse::<BigInt>().expect(
-        "low bound must be an integer",
-    );
+    let low = matches
+        .value_of("LOW")
+        .unwrap()
+        .parse::<BigInt>()
+        .expect("low bound must be an integer");
     let high = matches.value_of("HIGH").map_or(low.clone(), |h| {
         h.parse::<BigInt>().expect("high  bound must be an integer")
     });
