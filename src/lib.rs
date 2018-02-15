@@ -41,27 +41,9 @@ impl Options {
 
 fn literal_for(value: usize, options: &Options) -> Option<&'static str> {
     static SMALLS: [&'static str; 21] = [
-        "zéro",
-        "un",
-        "deux",
-        "trois",
-        "quatre",
-        "cinq",
-        "six",
-        "sept",
-        "huit",
-        "neuf",
-        "dix",
-        "onze",
-        "douze",
-        "treize",
-        "quatorze",
-        "quinze",
-        "seize",
-        "dix-sept",
-        "dix-huit",
-        "dix-neuf",
-        "vingt",
+        "zéro", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf", "dix",
+        "onze", "douze", "treize", "quatorze", "quinze", "seize", "dix-sept", "dix-huit",
+        "dix-neuf", "vingt",
     ];
     if value == 1 && options.feminine {
         Some("une")
