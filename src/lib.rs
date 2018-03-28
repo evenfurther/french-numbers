@@ -307,7 +307,7 @@ pub fn french_number_options<N: Integer + FromPrimitive + ToPrimitive + Display>
     n: &N,
     options: &Options,
 ) -> String {
-    if n < &N::zero() {
+    if *n < N::zero() {
         // Take the absolute value of n without consuming it. Since n is
         // negative, we know that we can build the -1 constant.
         let n = n.div_floor(&N::from_isize(-1).unwrap());
