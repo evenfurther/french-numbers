@@ -2,12 +2,10 @@
 extern crate clap;
 extern crate french_numbers;
 extern crate num_bigint;
-extern crate num_traits;
 
 use clap::*;
 use french_numbers::*;
 use num_bigint::BigInt;
-use num_traits::*;
 
 // List a single number, or numbers between two bounds given on the command line
 fn main() {
@@ -46,6 +44,6 @@ fn main() {
         } else {
             println!("{}", repr);
         }
-        i = i + BigInt::one();
+        i = i + 1;
     }
 }

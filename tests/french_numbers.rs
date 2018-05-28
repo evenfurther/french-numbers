@@ -29,9 +29,9 @@ fn test_french_number() {
 fn test_big_french_number() {
     let mut big = BigInt::one();
     for _ in 1..103 {
-        big = big * BigInt::from_u64(10).unwrap();
+        big *= 10;
     }
-    big = big - BigInt::one();
+    big -= 1;
     assert_eq!(french_number(&big).len(), 1527);
     assert_eq!(french_number(&-big).len(), 1533);
 }
@@ -40,7 +40,7 @@ fn test_big_french_number() {
 fn test_too_big_french_number() {
     let mut big = BigInt::one();
     for _ in 1..103 {
-        big = big * BigInt::from_u64(10).unwrap();
+        big *= 10;
     }
     assert_eq!(french_number(&big), big.to_string());
     assert_eq!(french_number(&-big.clone()), (-big).to_string());
