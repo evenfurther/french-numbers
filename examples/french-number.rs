@@ -44,6 +44,6 @@ fn main() {
         } else {
             println!("{}", repr);
         }
-        i = i + 1;
+        i += 1;
     }
 }

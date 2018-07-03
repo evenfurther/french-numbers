@@ -325,7 +325,7 @@ pub fn french_number_options<N: Integer + FromPrimitive + ToPrimitive + Display>
 #[cfg(test)]
 mod tests {
 
-    use ::*;
+    use *;
 
     #[test]
     fn test_literal_for() {
@@ -393,19 +393,19 @@ mod tests {
         );
         assert_eq!(basic(&2001, &Default::default()).unwrap(), "deux-mille-un");
         assert_eq!(
-            basic(&300001, &Default::default()).unwrap(),
+            basic(&300_001, &Default::default()).unwrap(),
             "trois-cent-mille-un"
         );
         assert_eq!(
-            basic(&180203, &Default::default()).unwrap(),
+            basic(&180_203, &Default::default()).unwrap(),
             "cent-quatre-vingt-mille-deux-cent-trois"
         );
         assert_eq!(
-            basic(&180203, &Default::default()).unwrap(),
+            basic(&180_203, &Default::default()).unwrap(),
             "cent-quatre-vingt-mille-deux-cent-trois"
         );
         assert_eq!(
-            basic(&17180203, &Default::default()).unwrap(),
+            basic(&17_180_203, &Default::default()).unwrap(),
             "dix-sept-millions-cent-quatre-vingt-mille-deux-cent-trois"
         );
     }
