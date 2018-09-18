@@ -17,8 +17,3 @@ num-traits = "0.2"
 [dev-dependencies]
 clap = "2.25"
 num-bigint = "0.2"
-
-[package.metadata.release]
-sign-commit = true
-pre-release-replacements = [{file = "README.md", search="^french-numbers = \".*\"$", replace="french-numbers = \"{{version}}\""}]
-dev-version-ext = "pre"
