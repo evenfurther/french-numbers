@@ -36,13 +36,13 @@ numbers predating the 1990 orthographic reform:
 ```rust
 use french_numbers::*;
 
-assert_eq!(french_number_options(&37251061, &Options { feminine: false, reformed: true}),
+assert_eq!(french_number_options(&37251061, &POST_REFORM_MASCULINE),
            "trente-sept-millions-deux-cent-cinquante-et-un-mille-soixante-et-un");
-assert_eq!(french_number_options(&37251061, &Options { feminine: true, reformed: true}),
+assert_eq!(french_number_options(&37251061, &POST_REFORM_FEMININE),
            "trente-sept-millions-deux-cent-cinquante-et-un-mille-soixante-et-une");
-assert_eq!(french_number_options(&37251061, &Options { feminine: true, reformed: false }),
+assert_eq!(french_number_options(&37251061, &PRE_REFORM_FEMININE),
            "trente-sept millions deux cent cinquante et un mille soixante et une");
-assert_eq!(french_number_options(&37251061, &Options { feminine: false, reformed: false }),
+assert_eq!(french_number_options(&37251061, &PRE_REFORM_MASCULINE),
            "trente-sept millions deux cent cinquante et un mille soixante et un")
 ```
 
