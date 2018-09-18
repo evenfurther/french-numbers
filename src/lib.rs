@@ -21,17 +21,40 @@ pub struct Options {
     pub reformed: bool,
 }
 
+/// Pre 1990 reform masculine variant.
+pub static PRE_REFORM_MASCULINE: Options = Options {
+    feminine: false,
+    reformed: false,
+};
+
+/// Pre 1990 reform feminine variant.
+pub static PRE_REFORM_FEMININE: Options = Options {
+    feminine: true,
+    reformed: false,
+};
+
+/// Post 1990 reform masculine variant. This is the default.
+pub static POST_REFORM_MASCULINE: Options = Options {
+    feminine: false,
+    reformed: true,
+};
+
+/// Post 1990 reform feminine variant.
+pub static POST_REFORM_FEMININE: Options = Options {
+    feminine: true,
+    reformed: true,
+};
+
 impl Default for Options {
     fn default() -> Options {
         Options {
-            feminine: false,
-            reformed: true,
+            ..POST_REFORM_MASCULINE
         }
     }
 }
 
 impl Options {
-    fn masculine(&self) -> Self {
+    fn masculinize(&self) -> Self {
         Options {
             feminine: false,
             ..*self
@@ -212,7 +235,7 @@ fn push_space_or_dash(str: &mut String, options: &Options) {
 fn smaller_than_1000000(n: usize, options: &Options) -> String {
     let (thousands, rest) = n.div_rem(&1000);
     let prefix = if thousands > 1 {
-        let mut thousands = basic(&thousands, &options.masculine()).unwrap();
+        let mut thousands = basic(&thousands, &options.masculinize()).unwrap();
         unpluralize(&mut thousands);
         push_space_or_dash(&mut thousands, options);
         thousands.push_str("mille");
@@ -239,7 +262,7 @@ fn over_1000000<N: Integer + FromPrimitive + ToPrimitive>(
         let (rest, prefix) = n.div_rem(&thousand);
         let prefix = prefix.to_usize().unwrap();
         if prefix > 0 {
-            let mut str = basic(&prefix, &options.masculine()).unwrap();
+            let mut str = basic(&prefix, &options.masculinize()).unwrap();
             push_space_or_dash(&mut str, options);
             if !add_unit_for(&mut str, prefix, log1000) {
                 return None;
@@ -280,7 +303,8 @@ pub fn french_number<N: Integer + FromPrimitive + ToPrimitive + Display>(n: &N) 
     french_number_options(n, &Default::default())
 }
 
-/// Compute the French language representation of the given number.
+/// Compute the French language representation of the given number with
+/// the given formatting options.
 ///
 /// If the number is too large (greater than 10^103), then its numerical
 /// representation is returned with a leading minus sign if needed.
@@ -290,17 +314,13 @@ pub fn french_number<N: Integer + FromPrimitive + ToPrimitive + Display>(n: &N) 
 /// ```
 /// use french_numbers::*;
 ///
-/// assert_eq!(french_number_options(&37251061,
-///                                  &Options { feminine: false, reformed: true}),
+/// assert_eq!(french_number_options(&37251061, &POST_REFORM_MASCULINE),
 ///            "trente-sept-millions-deux-cent-cinquante-et-un-mille-soixante-et-un");
-/// assert_eq!(french_number_options(&37251061,
-///                                  &Options { feminine: true, reformed: true}),
+/// assert_eq!(french_number_options(&37251061, &POST_REFORM_FEMININE),
 ///            "trente-sept-millions-deux-cent-cinquante-et-un-mille-soixante-et-une");
-/// assert_eq!(french_number_options(&37251061,
-///                                  &Options { feminine: true, reformed: false }),
+/// assert_eq!(french_number_options(&37251061, &PRE_REFORM_FEMININE),
 ///            "trente-sept millions deux cent cinquante et un mille soixante et une");
-/// assert_eq!(french_number_options(&37251061,
-///                                  &Options { feminine: false, reformed: false }),
+/// assert_eq!(french_number_options(&37251061, &PRE_REFORM_MASCULINE),
 ///            "trente-sept millions deux cent cinquante et un mille soixante et un")
 /// ```
 pub fn french_number_options<N: Integer + FromPrimitive + ToPrimitive + Display>(
