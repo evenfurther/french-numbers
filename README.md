@@ -14,7 +14,7 @@ In your `Cargo.toml`, put:
 
 ``` ini
 [dependencies]
-french-numbers = "0.1"
+french-numbers = "1.0"
 ```
 
 You can then use the `french_number` function from the `french_numbers` crate
