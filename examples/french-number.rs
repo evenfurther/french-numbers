@@ -19,7 +19,8 @@ fn main() {
             -r, --no-reform  'use the pre-1990 orthographic reform writing'
             <LOW>            'number (or low bound) to use'
             [HIGH]           'optional high bound'",
-        ).get_matches();
+        )
+        .get_matches();
     let options = Options {
         feminine: matches.is_present("feminine"),
         reformed: !matches.is_present("no-reform"),
