@@ -345,7 +345,7 @@ pub fn french_number_options<N: Integer + FromPrimitive + ToPrimitive + Display>
 #[cfg(test)]
 mod tests {
 
-    use *;
+    use crate::*;
 
     #[test]
     fn test_literal_for() {
