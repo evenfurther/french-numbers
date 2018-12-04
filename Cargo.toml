@@ -9,6 +9,7 @@ version = "1.0.2-pre"
 authors = ["Samuel Tardieu <sam@rfc1149.net>"]
 categories = ["value-formatting"]
 readme = "README.md"
+edition = "2018"
 
 [dependencies]
 num-integer = "0.1"

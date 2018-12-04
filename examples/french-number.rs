@@ -1,7 +1,3 @@
-extern crate clap;
-extern crate french_numbers;
-extern crate num_bigint;
-
 use clap::*;
 use french_numbers::*;
 use num_bigint::BigInt;
