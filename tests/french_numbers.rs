@@ -1,12 +1,7 @@
 #![cfg(test)]
 
-extern crate french_numbers;
 use french_numbers::*;
-
-extern crate num_bigint;
 use num_bigint::BigInt;
-
-extern crate num_traits;
 use num_traits::*;
 
 #[test]
