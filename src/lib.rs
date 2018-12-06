@@ -2,9 +2,6 @@
 
 #![deny(missing_docs)]
 
-extern crate num_integer;
-extern crate num_traits;
-
 use num_integer::*;
 use num_traits::*;
 use std::fmt::Display;
