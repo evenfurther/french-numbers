@@ -281,6 +281,10 @@ fn over_1000000<N: Integer + FromPrimitive + ToPrimitive>(
 /// If the number is too large (greater than 10^103), then its numerical
 /// representation is returned with a leading minus sign if needed.
 ///
+/// Also, the smallest number of a bounded signed numerical type will be
+/// returned as a numerical representation because the opposite value
+/// cannot be computed. For example, `-128u8` will be shown as `-128`.
+///
 /// By default, the masculine declination is used, as well as the preferred
 /// orthographic form introduced in the 1990 reform (use hyphens everywhere).
 /// See `french_number_options` if you wish to change either of those options.
@@ -296,7 +300,9 @@ fn over_1000000<N: Integer + FromPrimitive + ToPrimitive>(
 /// assert_eq!(french_number(&-200000001), "moins deux-cents-millions-un");
 /// assert_eq!(french_number(&-204000001), "moins deux-cent-quatre-millions-un");
 /// ```
-pub fn french_number<N: Integer + FromPrimitive + ToPrimitive + Display>(n: &N) -> String {
+pub fn french_number<N: Integer + FromPrimitive + ToPrimitive + Display + CheckedMul>(
+    n: &N,
+) -> String {
     french_number_options(n, &Default::default())
 }
 
@@ -305,6 +311,10 @@ pub fn french_number<N: Integer + FromPrimitive + ToPrimitive + Display>(n: &N) 
 ///
 /// If the number is too large (greater than 10^103), then its numerical
 /// representation is returned with a leading minus sign if needed.
+///
+/// Also, the smallest number of a bounded signed numerical type will be
+/// returned as a numerical representation because the opposite value
+/// cannot be computed. For example, `-128u8` will be shown as `-128`.
 ///
 /// # Example
 ///
@@ -320,18 +330,23 @@ pub fn french_number<N: Integer + FromPrimitive + ToPrimitive + Display>(n: &N) 
 /// assert_eq!(french_number_options(&37251061, &PRE_REFORM_MASCULINE),
 ///            "trente-sept millions deux cent cinquante et un mille soixante et un")
 /// ```
-pub fn french_number_options<N: Integer + FromPrimitive + ToPrimitive + Display>(
+pub fn french_number_options<N: Integer + FromPrimitive + ToPrimitive + Display + CheckedMul>(
     n: &N,
     options: &Options,
 ) -> String {
     if *n < N::zero() {
         // Take the absolute value of n without consuming it. Since n is
         // negative, we know that we can build the -1 constant.
-        let n = n.div_floor(&N::from_isize(-1).unwrap());
-        if let Some(str) = basic(&n, options) {
-            let mut result = "moins ".to_owned();
-            result.push_str(&str);
-            return result;
+        if let Some(n) = n.checked_mul(&N::from_i8(-1).unwrap()) {
+            if let Some(str) = basic(&n, options) {
+                let mut result = "moins ".to_owned();
+                result.push_str(&str);
+                return result;
+            }
+        } else {
+            // A minimal value on a bounded type might not exist as a
+            // positive value.
+            return format!("{}", n);
         }
     } else if let Some(result) = basic(n, options) {
         return result;
