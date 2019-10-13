@@ -60,7 +60,7 @@ impl Options {
 }
 
 fn literal_for(value: usize, options: &Options) -> Option<&'static str> {
-    static SMALLS: [&'static str; 21] = [
+    static SMALLS: [&str; 21] = [
         "zéro", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf", "dix",
         "onze", "douze", "treize", "quatorze", "quinze", "seize", "dix-sept", "dix-huit",
         "dix-neuf", "vingt",
@@ -101,7 +101,7 @@ fn literal_for(value: usize, options: &Options) -> Option<&'static str> {
 }
 
 fn add_unit_for(str: &mut String, prefix_count: usize, log1000: usize) -> bool {
-    static PREFIXES: [&'static str; 16] = [
+    static PREFIXES: [&str; 16] = [
         "m",
         "b",
         "tr",
