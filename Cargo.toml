@@ -12,9 +12,9 @@ readme = "README.md"
 edition = "2018"
 
 [dependencies]
-num-integer = "0.1"
-num-traits = "0.2"
+num-integer = "0.1.41"
+num-traits = "0.2.8"
 
 [dev-dependencies]
-clap = "2.25"
-num-bigint = "0.2"
+clap = "2.33.0"
+num-bigint = "0.2.3"
