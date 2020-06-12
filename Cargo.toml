@@ -17,4 +17,4 @@ num-traits = "0.2.8"
 
 [dev-dependencies]
 clap = "2.33.0"
-num-bigint = "0.2.3"
+num-bigint = "0.3.0"
