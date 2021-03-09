@@ -18,3 +18,4 @@ num-traits = "0.2.8"
 [dev-dependencies]
 clap = "2.33.0"
 num-bigint = "0.4.0"
+proptest = "1.0.0"
