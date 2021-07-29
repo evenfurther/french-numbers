@@ -234,3 +234,32 @@ fn test_educastream() {
         "vingt millions deux cent soixante-trois mille quatre cents"
     );
 }
+
+#[test]
+fn test_termiumplus() {
+    // From https://www.btb.termiumplus.gc.ca/tpv2guides/guides/clefsfp/index-fra.html?lang=fra&lettr=indx_catlog_m&page=9-nI6-pQZOTM.html
+    assert_eq!(
+        french_number_options(&1283, &PRE_REFORM_MASCULINE),
+        "mille deux cent quatre-vingt-trois"
+    );
+    assert_eq!(
+        french_number_options(&10_300_000_000_u64, &PRE_REFORM_MASCULINE),
+        "dix milliards trois cents millions"
+    );
+    assert_eq!(
+        french_number_options(&10_350_000_000_u64, &PRE_REFORM_MASCULINE),
+        "dix milliards trois cent cinquante millions"
+    );
+    assert_eq!(
+        french_number_options(&1283, &POST_REFORM_MASCULINE),
+        "mille-deux-cent-quatre-vingt-trois"
+    );
+    assert_eq!(
+        french_number_options(&10_300_000_000_u64, &POST_REFORM_MASCULINE),
+        "dix-milliards-trois-cents-millions"
+    );
+    assert_eq!(
+        french_number_options(&10_350_000_000_u64, &POST_REFORM_MASCULINE),
+        "dix-milliards-trois-cent-cinquante-millions"
+    );
+}
