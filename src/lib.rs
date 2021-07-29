@@ -249,11 +249,7 @@ fn over_1000000<N: Integer + FromPrimitive + ToPrimitive>(
 ) -> Option<String> {
     let thousand = N::from_u32(1000).unwrap();
     let (mut n, small) = n.div_rem(&N::from_u32(1_000_000).unwrap());
-    let mut base = if small != N::zero() {
-        basic(&small, options).unwrap()
-    } else {
-        String::new()
-    };
+    let mut base = (small != N::zero()).then(|| basic(&small, options).unwrap());
     let mut log1000 = 0;
     while n != N::zero() {
         let (rest, prefix) = n.div_rem(&thousand);
@@ -264,16 +260,16 @@ fn over_1000000<N: Integer + FromPrimitive + ToPrimitive>(
             if !add_unit_for(&mut str, prefix, log1000) {
                 return None;
             }
-            if !base.is_empty() {
+            if let Some(base) = base {
                 push_space_or_dash(&mut str, options);
                 str.push_str(&base);
             }
-            base = str;
+            base = Some(str);
         }
         log1000 += 1;
         n = rest;
     }
-    Some(base)
+    base
 }
 
 /// Compute the French language representation of the given number.
