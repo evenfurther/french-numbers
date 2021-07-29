@@ -8,34 +8,43 @@ proptest! {
 
         // Check default options
         assert_eq!(is, french_number_options(&i, &Options { feminine: false, reformed: true }));
-        let is = is.as_bytes();
 
         // Prefix should be "moins "
         let mis = french_number(&-i);
-        let mis = mis.as_bytes();
         if i != 0 {
-            assert_eq!(&mis[..6], b"moins ");
-            assert_eq!(&mis[6..], is);
+            let (p, s) = mis.split_at(6);
+            assert_eq!(p, "moins ");
+            assert_eq!(s, is);
         } else {
             assert_eq!(is, mis);
         }
 
         // "un" should be transformed into "une", but "onze" should be left untouched
         let fis = french_number_options(&i, &Options { feminine: true, reformed: true });
-        let fis = fis.as_bytes();
         if i % 10 == 1 && i % 100 != 11 &&  i % 100 != 71 && i % 100 != 91 {
-            assert_eq!(is, &fis[..fis.len()-1]);
-            assert_eq!(fis[fis.len()-1], b'e');
+            let (p, s) = fis.split_at(fis.len() - 1);
+            assert_eq!(is,p);
+            assert_eq!(s, "e");
         } else {
             assert_eq!(is, fis);
         }
 
-        // non-reformed should have some spaces instead of dashes
+        // Non-reformed should have some spaces instead of dashes
         let nris = french_number_options(&i, &Options { feminine: false, reformed: false });
-        let nris = nris.as_bytes();
         assert_eq!(is.len(), nris.len());
-        for k in 0..is.len() {
-            assert!((is[k] == b'-' && nris[k] == b' ') ^ (is[k] != b' ' && is[k] == nris[k]));
+        for (ri, nri) in is.chars().zip(nris.chars()) {
+            assert_ne!(ri, ' ');
+            if nri == ' ' {
+                assert_eq!(ri, '-');
+            } else {
+                assert_eq!(ri, nri);
+            }
+        }
+
+        // "moins" should never appear inside a number except at the beginning of a negative number
+        assert!(!is.contains("moins"));
+        if i != 0 {
+            assert!(!mis.strip_prefix("moins ").unwrap().contains("moins"));
         }
     }
 }
