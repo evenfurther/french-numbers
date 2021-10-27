@@ -2,6 +2,7 @@
 
 #![deny(missing_docs)]
 #![allow(clippy::non_ascii_literal)]
+#![doc = include_str!("../README.md")]
 
 use num_integer::Integer;
 use num_traits::{CheckedMul, FromPrimitive, ToPrimitive};
