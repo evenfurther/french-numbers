@@ -44,6 +44,7 @@ pub static POST_REFORM_FEMININE: Options = Options {
     reformed: true,
 };
 
+#[allow(clippy::derivable_impls)] // Clippy wrongly suggest that this Default trait can be derived
 impl Default for Options {
     fn default() -> Options {
         Options {
@@ -382,15 +383,15 @@ mod tests {
     #[test]
     fn test_add_unit_for() {
         let mut str = String::new();
-        assert_eq!(add_unit_for(&mut str, 1, 0), true);
+        assert!(add_unit_for(&mut str, 1, 0));
         assert_eq!(str, "million");
         str.clear();
-        assert_eq!(add_unit_for(&mut str, 2, 0), true);
+        assert!(add_unit_for(&mut str, 2, 0));
         assert_eq!(str, "millions");
         str.clear();
-        assert_eq!(add_unit_for(&mut str, 1, 3), true);
+        assert!(add_unit_for(&mut str, 1, 3));
         assert_eq!(str, "billiard");
-        assert_eq!(add_unit_for(&mut str, 1, 97), false);
+        assert!(!add_unit_for(&mut str, 1, 97));
     }
 
     #[test]
