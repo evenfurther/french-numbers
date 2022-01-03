@@ -4,18 +4,12 @@ use num_bigint::BigInt;
 
 // List a single number, or numbers between two bounds given on the command line
 fn main() {
-    let matches = App::new("french-number")
-        .about("Print number(s) in French")
-        .author(crate_authors!("\n"))
-        .version(crate_version!())
-        .args_from_usage(
-            "
-            -f, --feminine   'use the feminine declination'
-            -p, --prefix     'prefix output with the numerical representation'
-            -r, --no-reform  'use the pre-1990 orthographic reform writing'
-            <LOW>            'number (or low bound) to use'
-            [HIGH]           'optional high bound'",
-        )
+    let matches = app_from_crate!()
+        .arg(arg!(-f --feminine "Use the feminine declination"))
+        .arg(arg!(-p --prefix "Prefix output with the numerical representation"))
+        .arg(arg!(-r --"no-reform" "Use the pre-1990 orthographic reform writing"))
+        .arg(arg!(<LOW> "Number (or low bound) to use"))
+        .arg(arg!([HIGH] "Optional high bound"))
         .get_matches();
     let options = Options {
         feminine: matches.is_present("feminine"),
