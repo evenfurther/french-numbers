@@ -1,34 +1,37 @@
-use clap::*;
+use clap::Parser;
 use french_numbers::*;
 use num_bigint::BigInt;
 
+#[derive(Parser)]
+#[clap(version, author, about)]
+struct Args {
+    #[clap(short, long)]
+    /// Use the feminine declination
+    feminine: bool,
+    #[clap(short, long)]
+    /// Prefix output with the numerical representation
+    prefix: bool,
+    #[clap(short('r'), long)]
+    /// Use the pre-1990 orthographic reform writing
+    no_reform: bool,
+    /// Number (or low bound) to use
+    low: BigInt,
+    /// Optional high bound
+    high: Option<BigInt>,
+}
+
 // List a single number, or numbers between two bounds given on the command line
 fn main() {
-    let matches = app_from_crate!()
-        .arg(arg!(-f --feminine "Use the feminine declination"))
-        .arg(arg!(-p --prefix "Prefix output with the numerical representation"))
-        .arg(arg!(-r --"no-reform" "Use the pre-1990 orthographic reform writing"))
-        .arg(arg!(<LOW> "Number (or low bound) to use"))
-        .arg(arg!([HIGH] "Optional high bound"))
-        .get_matches();
+    let args = Args::parse();
     let options = Options {
-        feminine: matches.is_present("feminine"),
-        reformed: !matches.is_present("no-reform"),
+        feminine: args.feminine,
+        reformed: !args.no_reform,
     };
-    let low = matches
-        .value_of("LOW")
-        .unwrap()
-        .parse::<BigInt>()
-        .expect("low bound must be an integer");
-    let high = matches.value_of("HIGH").map_or(low.clone(), |h| {
-        h.parse::<BigInt>().expect("high  bound must be an integer")
-    });
-
-    let use_prefix = matches.is_present("prefix");
-    let mut i = low;
+    let high = args.high.unwrap_or_else(|| args.low.clone());
+    let mut i = args.low;
     while i <= high {
         let repr = french_number_options(&i, &options);
-        if use_prefix {
+        if args.prefix {
             println!("{} {}", i, repr);
         } else {
             println!("{}", repr);
