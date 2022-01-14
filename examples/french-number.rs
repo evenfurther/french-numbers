@@ -13,8 +13,14 @@ struct Args {
     prefix: bool,
     #[clap(short('r'), long)]
     /// Use the pre-1990 orthographic reform writing
+    ///
+    /// By default, all numbers are separated by dashes. Pre-1990, only
+    /// numbers smaller than 100 were separated by dashes, others words
+    /// were separated by spaces.
     no_reform: bool,
     /// Number (or low bound) to use
+    ///
+    /// If no high bound is supplied, this will be the only number displayed.
     low: BigInt,
     /// Optional high bound
     high: Option<BigInt>,
