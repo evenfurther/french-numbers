@@ -38,9 +38,9 @@ fn main() {
     while i <= high {
         let repr = french_number_options(&i, &options);
         if args.prefix {
-            println!("{} {}", i, repr);
+            println!("{i} {repr}");
         } else {
-            println!("{}", repr);
+            println!("{repr}");
         }
         i += 1;
     }
