@@ -369,7 +369,7 @@ pub fn french_number_options<N: Integer + FromPrimitive + ToPrimitive + Display 
 #[cfg(test)]
 mod tests {
 
-    use crate::*;
+    use crate::{add_unit_for, basic, literal_for, unpluralize};
 
     #[test]
     fn test_literal_for() {

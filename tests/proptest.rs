@@ -1,4 +1,4 @@
-use french_numbers::*;
+use french_numbers::{french_number, french_number_options, Options};
 use proptest::prelude::*;
 
 proptest! {

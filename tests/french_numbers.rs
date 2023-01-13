@@ -1,8 +1,11 @@
 #![cfg(test)]
 
-use french_numbers::*;
+use french_numbers::{
+    french_number, french_number_options, Options, POST_REFORM_FEMININE, POST_REFORM_MASCULINE,
+    PRE_REFORM_MASCULINE,
+};
 use num_bigint::BigInt;
-use num_traits::*;
+use num_traits::One;
 
 #[test]
 fn test_french_number() {

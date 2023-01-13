@@ -1,5 +1,5 @@
 use clap::Parser;
-use french_numbers::*;
+use french_numbers::{french_number_options, Options};
 use num_bigint::BigInt;
 
 #[derive(Parser)]
