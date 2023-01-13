@@ -279,7 +279,7 @@ fn over_1000000<N: Integer + FromPrimitive + ToPrimitive + Display>(
 
 fn add_minus(s: String, negative: bool) -> String {
     if negative {
-        format!("moins {}", s)
+        format!("moins {s}")
     } else {
         s
     }
@@ -290,7 +290,7 @@ where
     N: Display,
 {
     if negative {
-        format!("-{}", n)
+        format!("-{n}")
     } else {
         n.to_string()
     }

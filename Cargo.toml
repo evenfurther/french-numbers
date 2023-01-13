@@ -12,10 +12,10 @@ readme = "README.md"
 edition = "2021"
 
 [dependencies]
-num-integer = "0.1.41"
-num-traits = "0.2.8"
+num-integer = "0.1.45"
+num-traits = "0.2.15"
 
 [dev-dependencies]
-clap = { version = "4.0.8", features = ["derive"] }
-num-bigint = "0.4.0"
+clap = { version = "4.1.0", features = ["derive"] }
+num-bigint = "0.4.3"
 proptest = "1.0.0"
