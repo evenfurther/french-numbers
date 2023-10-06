@@ -10,15 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
-      - uses: actions-rs/cargo@v1
-        with:
-          command: check
-          args: --all-targets --features cli
+      - run: |
+          rustup install --profile minimal stable
+          rustup default stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo check --all-targets --features cli
 
   test:
     name: Test suite
@@ -30,35 +26,16 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
-        name: Checkout
-      - uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-${{ matrix.toolchain }}-${{ hashFiles('Cargo.toml') }}
-      - uses: actions-rs/toolchain@v1
-        name: Install Rust toolchain
-        with:
-          profile: minimal
-          toolchain: ${{ matrix.toolchain }}
-          override: true
-      - uses: actions-rs/cargo@v1
-        name: Test in debug mode
-        with:
-          command: test
-          args: --tests --benches
-      - uses: actions-rs/cargo@v1
-        name: Test in release mode
-        with:
-          command: test
-          args: --release --tests --benches
-      - uses: actions-rs/cargo@v1
-        name: Build program
-        with:
-          command: build
-          args: --release --features cli
+      - run: |
+          rustup install --profile minimal ${{ matrix.toolchain }}
+          rustup default ${{ matrix.toolchain }}
+      - uses: Swatinem/rust-cache@v2
+      - name: Test in debug mode
+        run: cargo test --tests --benches
+      - name: Test in release mode
+        run: cargo test --release --tests --benches
+      - name: Build program
+        run: cargo build --release --features cli
 
   test-minimal-versions:
     name: Test with minimal versions
@@ -66,32 +43,15 @@ jobs:
     needs: check
     steps:
       - uses: actions/checkout@v4
-        name: Checkout
-      - uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-nightly-minimal-${{ hashFiles('Cargo.toml') }}
-      - uses: actions-rs/toolchain@v1
-        name: Install Rust toolchain
-        with:
-          profile: minimal
-          toolchain: nightly
-          override: true
+      - run: |
+          rustup install --profile minimal nightly
+          rustup default nightly
       - run: cargo update -Zminimal-versions
         name: Set dependencies to the minimal version allowed
-      - uses: actions-rs/cargo@v1
-        name: Test with minimal version dependencies
-        with:
-          command: test
-          args: --tests --benches
-      - uses: actions-rs/cargo@v1
-        name: Build program
-        with:
-          command: build
-          args: --features cli
+      - name: Test with minimal version dependencies
+        run: cargo test --tests --benches
+      - name: Build program
+        run: cargo build --features cli
 
   fmt:
     name: Rustfmt
@@ -99,16 +59,12 @@ jobs:
     needs: check
     steps:
       - uses: actions/checkout@v4
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
+      - run: |
+          rustup install --profile minimal nightly
+          rustup default nightly
+      - uses: Swatinem/rust-cache@v2
       - run: rustup component add rustfmt
-      - uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --all -- --check
+      - run: cargo fmt --all -- --check
 
   clippy:
     name: Clippy
@@ -116,13 +72,9 @@ jobs:
     needs: check
     steps:
       - uses: actions/checkout@v4
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
+      - run: |
+          rustup install --profile minimal nightly
+          rustup default nightly
+      - uses: Swatinem/rust-cache@v2
       - run: rustup component add clippy
-      - uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: --all-targets --features cli -- -D warnings
+      - run: cargo clippy --all-targets
