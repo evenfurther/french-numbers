@@ -16,6 +16,9 @@ num-integer = "0.1.45"
 num-traits = "0.2.16"
 
 [dev-dependencies]
-clap = { version = "4.1.0", features = ["derive"] }
+clap = { version = "4.4.6", features = ["derive"] }
 num-bigint = "0.4.4"
 proptest = "1.0.0"
+
+# Fake dependency to avoid depending on a non-compiling older version
+proc-macro2 = "1.0.68"
