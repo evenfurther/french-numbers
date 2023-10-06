@@ -1,6 +1,5 @@
 # french-numbers
 
-[![Build Status](https://travis-ci.org/samueltardieu/french-numbers.svg?branch=master)](https://travis-ci.org/samueltardieu/french-numbers)
 [![Current Version](https://img.shields.io/crates/v/french-numbers.svg)](https://crates.io/crates/french-numbers)
 [![Documentation](https://docs.rs/french-numbers/badge.svg)](https://docs.rs/french-numbers)
 [![License: Apache-2.0/MIT](https://img.shields.io/crates/l/french-numbers.svg)](#license)
