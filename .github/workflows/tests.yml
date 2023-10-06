@@ -18,6 +18,7 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: check
+          args: --all-targets --features cli
 
   test:
     name: Test suite
@@ -53,6 +54,11 @@ jobs:
         with:
           command: test
           args: --release --tests --benches
+      - uses: actions-rs/cargo@v1
+        name: Build program
+        with:
+          command: build
+          args: --release --features cli
 
   test-minimal-versions:
     name: Test with minimal versions
@@ -81,6 +87,11 @@ jobs:
         with:
           command: test
           args: --tests --benches
+      - uses: actions-rs/cargo@v1
+        name: Build program
+        with:
+          command: build
+          args: --features cli
 
   fmt:
     name: Rustfmt
@@ -114,4 +125,4 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: clippy
-          args: --all-targets -- -D warnings
+          args: --all-targets --features cli -- -D warnings

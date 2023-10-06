@@ -45,23 +45,38 @@ assert_eq!(french_number_options(&37251061, &PRE_REFORM_MASCULINE),
            "trente-sept millions deux cent cinquante et un mille soixante et un")
 ```
 
-An example program can dump particular number, with different options:
+An example program can dump particular numbers, with various options combinations:
 
 ``` bash
-% cargo run --example french-number -- --help
-Print number(s) in French
+% cargo run --bin french-numbers --features cli -- --help
+Represent numbers in French language
 
-USAGE:
-    french-number [FLAGS] <LOW> [HIGH]
+Usage: french-numbers [OPTIONS] <LOW> [HIGH]
 
-FLAGS:
-    -f, --feminine     use the feminine declination
-    -h, --help         Prints help information
-    -r, --no-reform    use the pre-1990 orthographic reform writing
-    -p, --prefix       prefix output with the numerical representation
-    -V, --version      Prints version information
+Arguments:
+  <LOW>
+          Number (or low bound) to use
 
-ARGS:
-    <LOW>     number (or low bound) to use
-    <HIGH>    optional high bound
+          If no high bound is supplied, this will be the only number displayed.
+
+  [HIGH]
+          Optional high bound
+
+Options:
+  -f, --feminine
+          Use the feminine declination
+
+  -p, --prefix
+          Prefix output with the numerical representation
+
+  -r, --no-reform
+          Use the pre-1990 orthographic reform writing
+
+          By default, all numbers are separated by dashes. Pre-1990, only numbers smaller than 100 were separated by dashes, others words were separated by spaces.
+
+  -h, --help
+          Print help (see a summary with '-h')
+
+  -V, --version
+          Print version
 ```
