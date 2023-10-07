@@ -22,13 +22,19 @@ jobs:
     needs: check
     strategy:
       matrix:
-        toolchain: [stable, beta, nightly]
+        toolchain: [stable, beta, nightly, msrv]
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
-      - run: |
-          rustup install --profile minimal ${{ matrix.toolchain }}
-          rustup default ${{ matrix.toolchain }}
+      - name: Install Rust toolchain
+        run: |
+          if [ ${{ matrix.toolchain }} = msrv ]; then
+            toolchain=$(awk -F '"' '/^rust-version =/ {print $2}' Cargo.toml)
+          else
+            toolchain=${{ matrix.toolchain }}
+          fi
+          rustup install --profile minimal $toolchain
+          rustup default $toolchain
       - uses: Swatinem/rust-cache@v2
       - name: Test in debug mode
         run: cargo test --tests --benches
