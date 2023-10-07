@@ -8,15 +8,14 @@ This crate transforms a number into its French representation.
 
 ## Using this crate
 
-In your `Cargo.toml`, put:
+In your `Cargo.toml`, add:
 
 ``` ini
 [dependencies]
 french-numbers = "1.2.0"
 ```
 
-You can then use the `french_number` function from the `french_numbers` crate
-to format any integer into the beautiful French romance language:
+You can then use the `french_number` function from the `french_numbers` crate to format any integer into the French representation:
 
 ``` rust
 use french_numbers::french_number;
@@ -28,10 +27,9 @@ assert_eq!(french_number(&-200000001), "moins deux-cents-millions-un");
 assert_eq!(french_number(&-204000001), "moins deux-cent-quatre-millions-un");
 ```
 
-You can also request the use of the feminine form, or prefer the previous way of writing
-numbers predating the 1990 orthographic reform:
+You can also request the use of the feminine form, or prefer the previous way of writing numbers predating the 1990 orthographic reform:
 
-```rust
+``` rust
 use french_numbers::*;
 
 assert_eq!(french_number_options(&37251061, &POST_REFORM_MASCULINE),
