@@ -22,13 +22,10 @@ num-bigint = { version = "0.4.4", optional = true }
 num-integer = "0.1.46"
 num-traits = "0.2.18"
 
-# Fake dependency to avoid depending on a non-compiling older version
-proc-macro2 = { version = "1.0.79", optional = true }
-
 [dev-dependencies]
 num-bigint = "0.4.4"
 proptest = "1.4.0"
 
 [features]
 default = []
-cli = ["dep:num-bigint", "dep:clap", "dep:proc-macro2"]
+cli = ["dep:num-bigint", "dep:clap"]
