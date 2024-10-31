@@ -17,14 +17,14 @@ name = "french-numbers"
 required-features = ["cli"]
 
 [dependencies]
-clap = { version = "4.5.4", features = ["derive"], optional = true }
-num-bigint = { version = "0.4.4", optional = true }
+clap = { version = "4.5.20", features = ["derive"], optional = true }
+num-bigint = { version = "0.4.6", optional = true }
 num-integer = "0.1.46"
 num-traits = "0.2.19"
 
 [dev-dependencies]
-num-bigint = "0.4.4"
-proptest = "1.4.0"
+num-bigint = "0.4.6"
+proptest = "1.5.0"
 
 [features]
 default = []
