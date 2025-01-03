@@ -123,7 +123,7 @@ fn add_unit_for(str: &mut String, prefix_count: usize, log1000: usize) -> bool {
         "quindéc",
         "sexdéc",
     ];
-    PREFIXES.get(log1000 / 2).map_or(false, |prefix| {
+    PREFIXES.get(log1000 / 2).is_some_and(|prefix| {
         str.push_str(prefix);
         if log1000 % 2 == 0 {
             str.push_str("illion");
