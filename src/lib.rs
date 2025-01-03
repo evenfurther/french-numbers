@@ -54,7 +54,7 @@ impl Default for Options {
 }
 
 impl Options {
-    fn masculinize(&self) -> Self {
+    const fn masculinize(&self) -> Self {
         Options {
             feminine: false,
             ..*self
