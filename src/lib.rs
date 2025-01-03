@@ -33,29 +33,27 @@ pub static PRE_REFORM_FEMININE: Options = Options {
 };
 
 /// Post 1990 reform masculine variant. This is the default.
-pub static POST_REFORM_MASCULINE: Options = Options {
+pub const POST_REFORM_MASCULINE: Options = Options {
     feminine: false,
     reformed: true,
 };
 
 /// Post 1990 reform feminine variant.
-pub static POST_REFORM_FEMININE: Options = Options {
+pub const POST_REFORM_FEMININE: Options = Options {
     feminine: true,
     reformed: true,
 };
 
 #[allow(clippy::derivable_impls)] // Clippy wrongly suggest that this Default trait can be derived
 impl Default for Options {
-    fn default() -> Options {
-        Options {
-            ..POST_REFORM_MASCULINE
-        }
+    fn default() -> Self {
+        POST_REFORM_MASCULINE
     }
 }
 
 impl Options {
     const fn masculinize(&self) -> Self {
-        Options {
+        Self {
             feminine: false,
             ..*self
         }
