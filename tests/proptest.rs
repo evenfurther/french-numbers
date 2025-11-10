@@ -3,7 +3,7 @@ use proptest::prelude::*;
 
 proptest! {
     #[test]
-    fn sanity(i in 0..std::i128::MAX) {
+    fn sanity(i in 0..i128::MAX) {
         let is = french_number(&i);
 
         // Check default options
