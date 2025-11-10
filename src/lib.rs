@@ -141,7 +141,12 @@ fn unpluralize(str: &mut String) {
     }
 }
 
-fn complete(mut str: String, n: usize, prefix_under_100: bool, options: &Options) -> String {
+fn append_remainder(
+    mut str: String,
+    n: usize,
+    prefix_under_100: bool,
+    options: &Options,
+) -> String {
     if n > 0 {
         unpluralize(&mut str);
         if n == 1 {
@@ -163,13 +168,13 @@ fn complete(mut str: String, n: usize, prefix_under_100: bool, options: &Options
             } else {
                 ' '
             });
-            str.push_str(&basic(&n, options, false));
+            str.push_str(&to_french_repr(&n, options, false));
         }
     }
     str
 }
 
-fn basic<N: Integer + FromPrimitive + ToPrimitive + Display>(
+fn to_french_repr<N: Integer + FromPrimitive + ToPrimitive + Display>(
     n: &N,
     options: &Options,
     negative: bool,
@@ -178,8 +183,8 @@ fn basic<N: Integer + FromPrimitive + ToPrimitive + Display>(
         .and_then(|n| {
             literal_for(n, options).or_else(|| match n {
                 n if n < 60 => Some(smaller_than_60(n, options)),
-                n if n < 80 => Some(base_onto(60, n, options)),
-                n if n < 100 => Some(base_onto(80, n, options)),
+                n if n < 80 => Some(add_to_base(60, n, options)),
+                n if n < 100 => Some(add_to_base(80, n, options)),
                 n if n < 1000 => Some(smaller_than_1000(n, options)),
                 n if n < 2000 => Some(smaller_than_2000(n, options)),
                 n if n < 1_000_000 => Some(smaller_than_1000000(n, options)),
@@ -194,16 +199,16 @@ fn basic<N: Integer + FromPrimitive + ToPrimitive + Display>(
 
 fn smaller_than_60(n: usize, options: &Options) -> String {
     let unit = n % 10;
-    complete(
-        basic(&(n - unit), &Options::default(), false),
+    append_remainder(
+        to_french_repr(&(n - unit), &Options::default(), false),
         unit,
         true,
         options,
     )
 }
 
-fn base_onto(b: usize, n: usize, options: &Options) -> String {
-    complete(literal_for(b, options).unwrap(), n - b, true, options)
+fn add_to_base(b: usize, n: usize, options: &Options) -> String {
+    append_remainder(literal_for(b, options).unwrap(), n - b, true, options)
 }
 
 fn smaller_than_1000(n: usize, options: &Options) -> String {
@@ -216,11 +221,11 @@ fn smaller_than_1000(n: usize, options: &Options) -> String {
     } else {
         String::from("cent")
     };
-    complete(result, rest, false, options)
+    append_remainder(result, rest, false, options)
 }
 
 fn smaller_than_2000(n: usize, options: &Options) -> String {
-    complete(String::from("mille"), n - 1000, false, options)
+    append_remainder(String::from("mille"), n - 1000, false, options)
 }
 
 fn push_space_or_dash(str: &mut String, options: &Options) {
@@ -230,7 +235,7 @@ fn push_space_or_dash(str: &mut String, options: &Options) {
 fn smaller_than_1000000(n: usize, options: &Options) -> String {
     let (thousands, rest) = n.div_rem(&1000);
     let prefix = if thousands > 1 {
-        let mut thousands = basic(&thousands, &options.masculinize(), false);
+        let mut thousands = to_french_repr(&thousands, &options.masculinize(), false);
         unpluralize(&mut thousands);
         push_space_or_dash(&mut thousands, options);
         thousands.push_str("mille");
@@ -238,7 +243,7 @@ fn smaller_than_1000000(n: usize, options: &Options) -> String {
     } else {
         String::from("mille")
     };
-    complete(prefix, rest, false, options)
+    append_remainder(prefix, rest, false, options)
 }
 
 fn over_1000000<N: Integer + FromPrimitive + ToPrimitive + Display>(
@@ -251,14 +256,14 @@ fn over_1000000<N: Integer + FromPrimitive + ToPrimitive + Display>(
     let mut base = if small == N::zero() {
         None
     } else {
-        Some(basic(&small, options, false))
+        Some(to_french_repr(&small, options, false))
     };
     let mut log1000 = 0;
     while num != N::zero() {
         let (rest, prefix) = num.div_rem(&thousand);
         let prefix = prefix.to_usize().unwrap();
         if prefix > 0 {
-            let mut str = basic(&prefix, &options.masculinize(), false);
+            let mut str = to_french_repr(&prefix, &options.masculinize(), false);
             push_space_or_dash(&mut str, options);
             if !add_unit_for(&mut str, prefix, log1000) {
                 return add_minus_digits(n, negative);
@@ -358,16 +363,16 @@ pub fn french_number_options<N: Integer + FromPrimitive + ToPrimitive + Display 
         // representable with this type.
         N::from_i8(-1)
             .and_then(|m1| m1.checked_mul(n))
-            .map_or_else(|| n.to_string(), |n| basic(&n, options, true))
+            .map_or_else(|| n.to_string(), |n| to_french_repr(&n, options, true))
     } else {
-        basic(n, options, false)
+        to_french_repr(n, options, false)
     }
 }
 
 #[cfg(test)]
 mod tests {
 
-    use crate::{add_unit_for, basic, literal_for, unpluralize};
+    use crate::{add_unit_for, literal_for, to_french_repr, unpluralize};
 
     #[test]
     fn test_literal_for() {
@@ -403,51 +408,87 @@ mod tests {
     }
 
     #[test]
-    fn test_basic() {
-        assert_eq!(basic(&0, &Default::default(), false), "zéro");
-        assert_eq!(basic(&21, &Default::default(), false), "vingt-et-un");
-        assert_eq!(basic(&54, &Default::default(), false), "cinquante-quatre");
-        assert_eq!(basic(&64, &Default::default(), false), "soixante-quatre");
-        assert_eq!(basic(&71, &Default::default(), false), "soixante-et-onze");
-        assert_eq!(basic(&72, &Default::default(), false), "soixante-douze");
-        assert_eq!(basic(&80, &Default::default(), false), "quatre-vingts");
-        assert_eq!(basic(&81, &Default::default(), false), "quatre-vingt-un");
-        assert_eq!(basic(&91, &Default::default(), false), "quatre-vingt-onze");
-        assert_eq!(basic(&101, &Default::default(), false), "cent-un");
-        assert_eq!(basic(&800, &Default::default(), false), "huit-cents");
-        assert_eq!(basic(&803, &Default::default(), false), "huit-cent-trois");
+    fn test_to_french_repr() {
+        assert_eq!(to_french_repr(&0, &Default::default(), false), "zéro");
         assert_eq!(
-            basic(&872, &Default::default(), false),
+            to_french_repr(&21, &Default::default(), false),
+            "vingt-et-un"
+        );
+        assert_eq!(
+            to_french_repr(&54, &Default::default(), false),
+            "cinquante-quatre"
+        );
+        assert_eq!(
+            to_french_repr(&64, &Default::default(), false),
+            "soixante-quatre"
+        );
+        assert_eq!(
+            to_french_repr(&71, &Default::default(), false),
+            "soixante-et-onze"
+        );
+        assert_eq!(
+            to_french_repr(&72, &Default::default(), false),
+            "soixante-douze"
+        );
+        assert_eq!(
+            to_french_repr(&80, &Default::default(), false),
+            "quatre-vingts"
+        );
+        assert_eq!(
+            to_french_repr(&81, &Default::default(), false),
+            "quatre-vingt-un"
+        );
+        assert_eq!(
+            to_french_repr(&91, &Default::default(), false),
+            "quatre-vingt-onze"
+        );
+        assert_eq!(to_french_repr(&101, &Default::default(), false), "cent-un");
+        assert_eq!(
+            to_french_repr(&800, &Default::default(), false),
+            "huit-cents"
+        );
+        assert_eq!(
+            to_french_repr(&803, &Default::default(), false),
+            "huit-cent-trois"
+        );
+        assert_eq!(
+            to_french_repr(&872, &Default::default(), false),
             "huit-cent-soixante-douze"
         );
         assert_eq!(
-            basic(&880, &Default::default(), false),
+            to_french_repr(&880, &Default::default(), false),
             "huit-cent-quatre-vingts"
         );
         assert_eq!(
-            basic(&882, &Default::default(), false),
+            to_french_repr(&882, &Default::default(), false),
             "huit-cent-quatre-vingt-deux"
         );
-        assert_eq!(basic(&1001, &Default::default(), false), "mille-un");
         assert_eq!(
-            basic(&1882, &Default::default(), false),
+            to_french_repr(&1001, &Default::default(), false),
+            "mille-un"
+        );
+        assert_eq!(
+            to_french_repr(&1882, &Default::default(), false),
             "mille-huit-cent-quatre-vingt-deux"
         );
-        assert_eq!(basic(&2001, &Default::default(), false), "deux-mille-un");
         assert_eq!(
-            basic(&300_001, &Default::default(), false),
+            to_french_repr(&2001, &Default::default(), false),
+            "deux-mille-un"
+        );
+        assert_eq!(
+            to_french_repr(&300_001, &Default::default(), false),
             "trois-cent-mille-un"
         );
         assert_eq!(
-            basic(&180_203, &Default::default(), false),
+            to_french_repr(&180_203, &Default::default(), false),
             "cent-quatre-vingt-mille-deux-cent-trois"
         );
         assert_eq!(
-            basic(&180_203, &Default::default(), false),
+            to_french_repr(&180_203, &Default::default(), false),
             "cent-quatre-vingt-mille-deux-cent-trois"
         );
         assert_eq!(
-            basic(&17_180_203, &Default::default(), false),
+            to_french_repr(&17_180_203, &Default::default(), false),
             "dix-sept-millions-cent-quatre-vingt-mille-deux-cent-trois"
         );
     }
